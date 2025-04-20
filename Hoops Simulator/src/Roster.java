@@ -5,18 +5,63 @@ public class Roster {
     private int[] minutes = {};
     private Player[] players;
 
-    public boolean setMinutes(int[] inpMinutes){
-        // can only give minutes to players on the roster
-        if (inpMinutes.length > players.length){
-            return false;
+    public int noPlayers(){
+        int cnt = 0;
+        for (int i = 0; i < ROSTER_SIZE; i++){
+            if (playerExists(i)){
+                cnt++;
+            }
         }
+        return cnt;
+    }
 
-        for (int i = 0; i < inpMinutes.length; i++){
-            minutes[i] = inpMinutes[i];
+    /**
+     * NYI - returns this roster's average of a certain attribute
+     * @param name
+     * @return
+     */
+    public double getAverage(String name){
+        double sum = 0;
+        for (int i = 0; i < ROSTER_SIZE; i++){
+            if (playerExists(i)){
+                double val = players[i].getAttributeValue(name);
+                if (val != -1){
+                    sum += val;
+                }
+            }
         }
+        return (sum / (double) noPlayers());
+    }
+    /**
+     * NYI
+     * @param inpMinutes
+     * @return
+     */
+    public boolean setMinutes(int[] inpMinutes){
+        if (inpMinutes.length > players.length) 
+            return false;
+        for (int i = 0; i < inpMinutes.length; i++)
+            minutes[i] = inpMinutes[i];
         return true;
     }
-    
+    /**
+     * Swaps the roster spot of 2 players
+     * @param pos1
+     * @param pos2
+     */
+    public void swapPlayers(int pos1, int pos2){
+        Player p1 = players[pos1];
+        players[pos1] = players[pos2];
+        players[pos2] = p1;
+    }
+    /**
+     * Returns whether a roster spot is filled
+     * @param pos
+     * @return whether the specified roster spot is filled
+     */
+    public boolean playerExists(int pos){
+        return (players[pos] != null);
+    }
     /**
      * Removes a player from this roster
      * @param pos
@@ -27,7 +72,6 @@ public class Roster {
         players[pos] = null;
         return tar;
     }
-
     /**
      * Adds a non-null player to an empty roster spot
      * @param pos
@@ -47,7 +91,6 @@ public class Roster {
         players[pos] = player;
         return true;
     }
-
     /**
      * @depricated
      */
