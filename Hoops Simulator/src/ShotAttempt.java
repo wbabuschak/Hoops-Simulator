@@ -22,7 +22,7 @@ public class ShotAttempt {
     /**
      * The worst possible shot attempt from three has a 1% chance of going in
      */
-    public static final double THREE_MIN = 0.05;
+    public static final double THREE_MIN = 0.01;
     
 
     private int playerId;
