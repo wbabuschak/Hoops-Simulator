@@ -5,5 +5,9 @@ public class Main {
         game.shootingTest(CourtLocations.MIDRANGE);
         game.shootingTest(CourtLocations.THREE);
         game.shootingTest(CourtLocations.FT);
+
+        for (int i = 0; i < 100; i++){
+            System.out.println(Player.randomPlayer().toString());
+        }
     }
 }

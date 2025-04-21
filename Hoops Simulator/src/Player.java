@@ -1,4 +1,12 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Player {
     private String name;
@@ -15,7 +23,31 @@ public class Player {
      */
     private int age;
 
+    private static ArrayList<String> firstNames;
+    private static ArrayList<String> lastNames;
+
     private ArrayList<Attribute> attributes = new ArrayList<>();
+
+    private void parseNames() {
+        Scanner scanner;
+
+        firstNames = new ArrayList<String>();
+        InputStream inputStream = Player.class.getClassLoader().getResourceAsStream("ctrl/Firstnames.txt");
+        scanner = new Scanner(inputStream);
+        while (scanner.hasNextLine()){
+            firstNames.add(scanner.nextLine());
+        }
+        scanner.close();
+        
+        lastNames = new ArrayList<String>();
+        inputStream = Player.class.getClassLoader().getResourceAsStream("ctrl/Lastnames.txt");
+        scanner = new Scanner(inputStream);
+        while (scanner.hasNextLine()){
+            lastNames.add(scanner.nextLine());
+        }
+        scanner.close();
+
+    }
 
     /**
      * Returns the value of a named attribute
@@ -43,6 +75,7 @@ public class Player {
     }
 
     public Player(){
+        parseNames();
         name = "";
         height = -1;
         weight = -1;
@@ -61,7 +94,49 @@ public class Player {
         attributes.add(new Attribute("Pace", 0.0));
     }
 
+    public static Player randomPlayer(){
+        Player player = new Player();
+        player.name = "";
+        player.height = -1;
+        player.weight = -1;
+        player.age = -1;
+        
+        for (int i = 0; i < player.getAttributes().size(); i++){
+            double attValue = 100 * Math.random();
+            player.getAttributes().get(i).setValue(attValue);
+        }
+        
+        return player;
+    }
+
     public String getName(){
+        return name;
+    }
+
+    /**
+     * only to be used for setting attributes en masse
+     */
+    public ArrayList<Attribute> getAttributes(){
+        return attributes;
+    }
+
+    public String toString(){
+        String string = randomName();
+        string += " ";
+        for (int i = 0; i < getAttributes().size(); i++){
+            // string += getAttributes().get(i).getName();
+            // string += " ";
+            string += (int) getAttributes().get(i).getValue();
+            string += " ";
+        }
+        return string;
+    }
+
+    public static String randomName(){
+        String name = "";
+        name += firstNames.get((int) (firstNames.size() * Math.random()));
+        name += " ";
+        name += lastNames.get((int) (lastNames.size() * Math.random()));
         return name;
     }
 }
