@@ -31,6 +31,17 @@ public class Player {
         return -1;
     }
 
+    public boolean setAttributeValue(String name, double value){
+        int i = 0;
+        while (i < attributes.size()){
+            if (attributes.get(i).getName().equals(name)) break;
+            i++;
+        }
+        if (i == attributes.size()) return false;
+        attributes.get(i).setValue(value);
+        return true;
+    }
+
     public Player(){
         name = "";
         height = -1;
@@ -38,13 +49,19 @@ public class Player {
         age = -1;
         attributes.add(new Attribute("Rim Finishing", 0.0));
         attributes.add(new Attribute("Contested Rim Finishing", 0.0));
-        attributes.add(new Attribute("Midrange Shooting", 0.0));
-        attributes.add(new Attribute("Contested Midrange Shooting", 0.0));
-        attributes.add(new Attribute("3-Point Shooting", 0.0));
-        attributes.add(new Attribute("Contested 3-Point Shooting", 0.0));
-        attributes.add(new Attribute("Paint Defense", 0.0));
-        attributes.add(new Attribute("Perimeter Defense", 0.0));
+        attributes.add(new Attribute("Midrange", 0.0));
+        attributes.add(new Attribute("Contested Midrange", 0.0));
+        attributes.add(new Attribute("3pt", 0.0));
+        attributes.add(new Attribute("Contested 3pt", 0.0));
+        attributes.add(new Attribute("Free Throw", 0.0));
+        attributes.add(new Attribute("Passing", 0.0));
+        attributes.add(new Attribute("Paint D", 0.0));
+        attributes.add(new Attribute("Perimeter D", 0.0));
         attributes.add(new Attribute("Stamina", 0.0));
+        attributes.add(new Attribute("Pace", 0.0));
+    }
 
+    public String getName(){
+        return name;
     }
 }

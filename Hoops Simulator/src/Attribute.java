@@ -1,8 +1,11 @@
 public class Attribute {
     public static final double ATTRIBUTE_MAX = 99;
+    public static final double ATTRIBUTE_AVERAGE = ATTRIBUTE_MAX / 2.0;
+    
     private String name;
     private String desc;
     private double value;
+    
     
     /**
      * 

@@ -1,6 +1,6 @@
 public class Roster {
     public static final int ROSTER_SIZE = 12;
-    public static boolean forceRosterLimit = true;
+    public static boolean forceRosterLimit = false;
 
     private int[] minutes = {};
     private Player[] players;
@@ -109,5 +109,16 @@ public class Roster {
         }
         return true;
     }
+    /**
+     * Returns the player at a given position
+     * @param pos
+     * @return
+     */
+    public Player getPlayer(int pos){
+        return players[pos];
+    }
 
+    public Roster(){
+        players = new Player[ROSTER_SIZE];
+    }
 }

@@ -7,4 +7,16 @@ public class Team {
         return location + " " + name + "\n" + roster.toString();
     }
 
+    public double getRosterAttributeMean(String attributeName){
+        return roster.getAverage(attributeName);
+    }
+
+    public Roster getRoster(){
+        return roster;
+    }
+
+    public Team(){
+        roster = new Roster();
+    }
+
 }
