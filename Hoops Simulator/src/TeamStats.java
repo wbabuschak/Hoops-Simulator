@@ -6,6 +6,8 @@ public class TeamStats {
     private int score;
 
     public boolean changeScore(ShotAttempt shotAttempt){
+        //if (shotAttempt.make() != 0){System.out.println(shotAttempt.getShooter().getName() + " scored " + shotAttempt.make() + "!");}
+        score += shotAttempt.make();
         return shotAttempt.make() == 0;
     }
 
@@ -16,4 +18,6 @@ public class TeamStats {
     public TeamStats(Team team){
         this.team = team;
     }
+
+
 }

@@ -120,5 +120,29 @@ public class Roster {
 
     public Roster(){
         players = new Player[ROSTER_SIZE];
+        minutes = new int[ROSTER_SIZE];
+        for (int i = 0; i < ROSTER_SIZE; i++){
+            minutes[i] = 1;
+        }
+    }
+
+    public Player choosePlayerAtRandom(){
+        double total = 0.0;
+        for (int i = 0; i < ROSTER_SIZE; i++) {
+            total += minutes[i];
+        }
+
+        double r = Math.random() * total;
+        double cumulative = 0.0;
+
+        for (int i = 0; i < ROSTER_SIZE; i++) {
+            cumulative += minutes[i];
+            if (r <= cumulative) {
+                return (players[i]);
+            }
+        }
+        // should never occur
+        return null;
+
     }
 }

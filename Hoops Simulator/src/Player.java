@@ -1,10 +1,4 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -96,7 +90,7 @@ public class Player {
 
     public static Player randomPlayer(){
         Player player = new Player();
-        player.name = "";
+        player.name = randomName();
         player.height = -1;
         player.weight = -1;
         player.age = -1;
@@ -138,5 +132,17 @@ public class Player {
         name += " ";
         name += lastNames.get((int) (lastNames.size() * Math.random()));
         return name;
+    }
+
+    public CourtLocations getShotLocation(){
+         double r = Math.random();
+
+         if (r <= getAttributeValue("Rim Finishing") / (getAttributeValue("Rim Finishing") + getAttributeValue("Midrange") + getAttributeValue("3pt"))){
+            return CourtLocations.PAINT;
+         } else if (r <= (getAttributeValue("Rim Finishing") + getAttributeValue("Midrange")) / (getAttributeValue("Rim Finishing") + getAttributeValue("Midrange") + getAttributeValue("3pt"))){
+            return CourtLocations.MIDRANGE;
+         } else {
+            return CourtLocations.THREE;
+         }
     }
 }
