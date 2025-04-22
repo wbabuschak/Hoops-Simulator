@@ -1,5 +1,5 @@
 public class Game {
-    public static final int GAME_LENGTH = 40;
+    public static final int GAME_LENGTH = 48;
     public static final int SHOT_CLOCK_LENGTH = 24;
     public static final double MIN_PACE = 0.35;
     public static final double MAX_PACE = 0.90;
