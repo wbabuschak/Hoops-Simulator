@@ -12,6 +12,7 @@ public class Roster {
                 cnt++;
             }
         }
+        //System.out.println("found " + cnt + " players");
         return cnt;
     }
 
@@ -30,7 +31,7 @@ public class Roster {
                 }
             }
         }
-        return (sum / (double) noPlayers());
+        return ( (double) sum / (double) noPlayers());
     }
     /**
      * NYI
@@ -117,6 +118,23 @@ public class Roster {
     public Player getPlayer(int pos){
         return players[pos];
     }
+
+    /**
+     * Returns the position of a given player
+     * @param pos
+     * @return
+     */
+    public int getPosition(Player player){
+    //    System.out.println("DEBUG: " + player.getName());
+        for (int i = 0; i < ROSTER_SIZE; i++){
+      //      System.out.println("\tDEBUG: " + players[i].getName() + " " + players[i].equals(player));
+            if (players[i].equals(player)){
+                return i;
+            }
+        }
+        return -1;
+    }
+
 
     public Roster(){
         players = new Player[ROSTER_SIZE];

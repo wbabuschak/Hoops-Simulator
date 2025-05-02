@@ -15,6 +15,7 @@ public class Team {
     }
 
     public double getRosterAttributeMean(String attributeName){
+        //System.out.println(toString() + " (" + Thread.currentThread().getStackTrace()[2] + ")");
         return roster.getAverage(attributeName);
     }
 

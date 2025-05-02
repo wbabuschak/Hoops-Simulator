@@ -99,7 +99,6 @@ public class Player {
             double attValue = 100 * Math.random();
             player.getAttributes().get(i).setValue(attValue);
         }
-        
         return player;
     }
 
@@ -115,7 +114,7 @@ public class Player {
     }
 
     public String toString(){
-        String string = randomName();
+        String string = name;
         string += " ";
         for (int i = 0; i < getAttributes().size(); i++){
             // string += getAttributes().get(i).getName();
@@ -144,5 +143,10 @@ public class Player {
          } else {
             return CourtLocations.THREE;
          }
+    }
+
+    public boolean equals(Player player){
+        // System.out.println("\tDEBUG: " + player.toString() + " == " + toString() + " " + player.toString().equals(toString()));
+        return player.toString().equals(toString());
     }
 }
