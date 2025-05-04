@@ -86,6 +86,8 @@ public class Player {
         attributes.add(new Attribute("Perimeter D", 0.0));
         attributes.add(new Attribute("Stamina", 0.0));
         attributes.add(new Attribute("Pace", 0.0));
+        attributes.add(new Attribute("Offensive Discipline", 0.0));
+        attributes.add(new Attribute("Defensive Discipline", 0.0));
     }
 
     public static Player randomPlayer(){
@@ -134,8 +136,8 @@ public class Player {
     }
 
     public CourtLocations getShotLocation(){
-         double r = Math.random();
-
+        double r = Math.random();
+        //System.out.println("Rim Finishing " + getAttributeValue("Rim Finishing") + "  Midrange " + getAttributeValue("Midrange") + " 3pt " + getAttributeValue("3pt"));
          if (r <= getAttributeValue("Rim Finishing") / (getAttributeValue("Rim Finishing") + getAttributeValue("Midrange") + getAttributeValue("3pt"))){
             return CourtLocations.PAINT;
          } else if (r <= (getAttributeValue("Rim Finishing") + getAttributeValue("Midrange")) / (getAttributeValue("Rim Finishing") + getAttributeValue("Midrange") + getAttributeValue("3pt"))){

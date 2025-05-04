@@ -51,7 +51,7 @@ public class PlayerStats {
         int threes = madeThrees();
         String string = String.format("%-9s", slashline);
         if (fieldGoalsAttempted() > 0){
-            String fg = " ";
+            String fg = "| ";
             fg += fieldGoalsMade();
             fg += "/";
             fg += fieldGoalsAttempted();

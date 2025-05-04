@@ -37,6 +37,10 @@ public class Team {
         return team;
     }
 
+    public int[] getRosterMinutes(){
+        return roster.getMinutes();
+    }
+
     public String getName(){
         return name;
     }

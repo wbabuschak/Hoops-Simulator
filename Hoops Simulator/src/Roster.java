@@ -1,6 +1,7 @@
 public class Roster {
     public static final int ROSTER_SIZE = 12;
     public static boolean forceRosterLimit = false;
+    public static double skillReliance = 1.0;
 
     private int[] minutes = {};
     private Player[] players;
@@ -140,21 +141,78 @@ public class Roster {
         players = new Player[ROSTER_SIZE];
         minutes = new int[ROSTER_SIZE];
         for (int i = 0; i < ROSTER_SIZE; i++){
-            minutes[i] = 1;
+            minutes[i] = calculateRosterMinutes(i);
         }
     }
 
-    public Player choosePlayerAtRandom(){
+    public int[] getMinutes(){
+        int existingSum = 0;
+        int[] fetch = new int[ROSTER_SIZE];
+        for (int i = 0; i < ROSTER_SIZE; i++){
+            existingSum += minutes[i];
+        }
+        int currentSum = 0;
+        for (int i = 0; i < ROSTER_SIZE; i++){
+            fetch[i] =  (int) ((double) 5 * Game.GAME_LENGTH * minutes[i] / (double)existingSum);
+            currentSum += fetch[i];
+        }   
+        
+        for (int i = 0; currentSum < 5 * Game.GAME_LENGTH; i++){
+            fetch[i % 5]++;
+            currentSum++;
+        }
+        
+        for (int i = ROSTER_SIZE - 1; currentSum < 5 * Game.GAME_LENGTH; i--){
+            if (currentSum > 5 * Game.GAME_LENGTH){
+                while (fetch[i] > 0){
+                    fetch[i]--;
+                    currentSum--;
+                    if (currentSum == 5 * Game.GAME_LENGTH){
+                        break;
+                    }
+                }
+
+            }
+            
+        }
+
+        
+        return fetch;
+    }
+
+    public int calculateRosterMinutes(int i) {
+        if (i < 5) {
+            return 32;
+        }
+
+        return Math.max((int) (24 - 5.43 * (i - 5)), 0);
+    }
+
+
+    public Player chooseShooterAtRandom(){
         double total = 0.0;
         for (int i = 0; i < ROSTER_SIZE; i++) {
-            total += minutes[i];
+            if (minutes[i] == 0){
+                continue;
+            }
+            total += Math.pow(minutes[i], 2);
+            total += skillReliance * players[i].getAttributeValue("3pt");
+            total += skillReliance * players[i].getAttributeValue("Midrange");
+            total += skillReliance * players[i].getAttributeValue("Rim Finishing");
+
         }
 
         double r = Math.random() * total;
         double cumulative = 0.0;
 
         for (int i = 0; i < ROSTER_SIZE; i++) {
-            cumulative += minutes[i];
+            if (minutes[i] == 0){
+                continue;
+            }
+            cumulative += Math.pow(minutes[i], 2);
+            cumulative += skillReliance * players[i].getAttributeValue("3pt");
+            cumulative += skillReliance * players[i].getAttributeValue("Midrange");
+            cumulative += skillReliance * players[i].getAttributeValue("Rim Finishing");
             if (r <= cumulative) {
                 return (players[i]);
             }

@@ -2,7 +2,7 @@ public class ShotAttempt {
     /**
      * The best possible shot attempt at the rim has a 90% chance of going in
      */
-    public static final double RIM_SHOT_MAX = 0.90;
+    public static final double RIM_SHOT_MAX = 1.5;
     /**
      * The worst possible shot attempt at the rim has a 5% chance of going in
      */
@@ -18,15 +18,15 @@ public class ShotAttempt {
     /**
      * The best possible shot attempt from three has a 50% chance of going in
      */
-    public static final double THREE_MAX = 0.50;
+    public static final double THREE_MAX = 0.85;
     /**
      * The worst possible shot attempt from three has a 1% chance of going in
      */
     public static final double THREE_MIN = 0.01;
     /**
-     * The best possible defense halves shot quality
+     * The greatest possible defensive impact is 0
      */
-    public static final double DEFENSIVE_IMPACT = 0.5;
+    public static final double DEFENSIVE_IMPACT = 0.75;
     
 
     private Player player;
@@ -55,7 +55,7 @@ public class ShotAttempt {
                 // shots are contested if the defending team has a greater defense than the player has finishing skill
                 contested = defendingTeam.getRosterAttributeMean("Paint D") > player.getAttributeValue("Rim Finishing"); 
                 // if shots are contested, use the lower of contested and non-contested paint skill
-                shootingSkill = contested ? player.getAttributeValue("Rim Finishing") : Math.min(player.getAttributeValue("Rim Finishing"),player.getAttributeValue("Contested Rim Finishing"));
+                shootingSkill = !contested ? player.getAttributeValue("Rim Finishing") : Math.min(player.getAttributeValue("Rim Finishing"),player.getAttributeValue("Contested Rim Finishing"));
                 shotQuality = shootingSkill;
                 // adjust for team gravity, 3:1 weighting for player skill vs team 3pt gravity
                 shotQuality = (
@@ -65,14 +65,15 @@ public class ShotAttempt {
                     4.0 * (1.0 / (1.0 + Math.exp(-gravitySharpness * (Attribute.ATTRIBUTE_MAX - Attribute.ATTRIBUTE_AVERAGE))))
                 );
                 // defensive impact
-                shotQuality *= ((1-DEFENSIVE_IMPACT) + DEFENSIVE_IMPACT * (defendingTeam.getRosterAttributeMean("Paint D") / Attribute.ATTRIBUTE_MAX));
-                make = Math.max(shotQuality * RIM_SHOT_MAX, RIM_SHOT_MIN) < Math.random();
+                shotQuality *= (1-DEFENSIVE_IMPACT) + DEFENSIVE_IMPACT * ((Attribute.ATTRIBUTE_MAX - defendingTeam.getRosterAttributeMean("Paint D")) / Attribute.ATTRIBUTE_MAX);
+                make = Math.max(Math.min(shotQuality * RIM_SHOT_MAX,1.0), RIM_SHOT_MIN) > Math.random();
+                //System.out.println("shotQuality " + shotQuality + " " + courtLocation);
                 break;
             case CourtLocations.MIDRANGE:
                 // shots are contested if the defending team has a greater defense (average of paint + perimeter) than the player has finishing skill
                 contested = defendingTeam.getRosterAttributeMean("Paint D") + defendingTeam.getRosterAttributeMean("Perimeter D")> 2 * player.getAttributeValue("Rim Finishing"); 
                 // if shots are contested, use the lower of contested and non-contested midrange skill
-                shootingSkill = contested ? player.getAttributeValue("Midrange") : Math.min(player.getAttributeValue("Midrange"),player.getAttributeValue("Contested Midrange"));
+                shootingSkill = !contested ? player.getAttributeValue("Midrange") : Math.min(player.getAttributeValue("Midrange"),player.getAttributeValue("Contested Midrange"));
                 shotQuality = shootingSkill;
                 // adjust for team gravity, 6:1:1 weighting for player skill vs team 3pt gravity vs team rim gravity
                 shotQuality = 
@@ -81,14 +82,19 @@ public class ShotAttempt {
                 + 1.0 * (1.0 / (1.0 + Math.exp(-gravitySharpness * (shootingTeam.getRosterAttributeMean("Rim Finishing") - Attribute.ATTRIBUTE_AVERAGE))))  
                 / (1.0 / (1.0 + Math.exp(-gravitySharpness * (Attribute.ATTRIBUTE_MAX - Attribute.ATTRIBUTE_AVERAGE))))) / 8.0;
                 // defensive impact
-                shotQuality *= ((1-DEFENSIVE_IMPACT) + DEFENSIVE_IMPACT * ((defendingTeam.getRosterAttributeMean("Perimeter D") + defendingTeam.getRosterAttributeMean("Paint D")) / (2 * Attribute.ATTRIBUTE_MAX)));
-                make = Math.max(shotQuality * (RIM_SHOT_MAX + THREE_MAX) / 2, (RIM_SHOT_MIN + THREE_MIN) / 2) < Math.random();
+                shotQuality *= (1-DEFENSIVE_IMPACT) + DEFENSIVE_IMPACT * (
+                (Attribute.ATTRIBUTE_MAX - defendingTeam.getRosterAttributeMean("Perimeter D")) + 
+                (Attribute.ATTRIBUTE_MAX - defendingTeam.getRosterAttributeMean("Paint D"))
+                ) 
+                / (2 * Attribute.ATTRIBUTE_MAX);
+                make = Math.max(Math.min(shotQuality * (RIM_SHOT_MAX + THREE_MAX) / 2,1.0), (RIM_SHOT_MIN + THREE_MIN) / 2) > Math.random();
+                //System.out.println("shotQuality " + shotQuality + " " + courtLocation);
                 break;
             case CourtLocations.THREE:
                 // shots are contested if the defending team has a greater defense than the player has finishing skill
                 contested = defendingTeam.getRosterAttributeMean("Perimeter D") > player.getAttributeValue("3pt"); 
                 // if shots are contested, use the lower of contested and non-contested 3pt skill
-                shootingSkill = contested ? player.getAttributeValue("3pt") : Math.min(player.getAttributeValue("3pt"),player.getAttributeValue("Contested 3pt"));
+                shootingSkill = !contested ? player.getAttributeValue("3pt") : Math.min(player.getAttributeValue("3pt"),player.getAttributeValue("Contested 3pt"));
                 shotQuality = shootingSkill;
                 //System.out.println("after decision " + shootingSkill);
                 // adjust for team gravity, 3:1 weighting for player skill vs team rim gravity
@@ -102,10 +108,11 @@ public class ShotAttempt {
                 // defensive impact
                 //System.out.println("shotQuality = " + shotQuality + " defendingTeam.getRosterAttributeMean(\"Perimeter D\") = " + defendingTeam.getRosterAttributeMean("Perimeter D") + " Attribute.ATTRIBUTE_MAX = " + Attribute.ATTRIBUTE_MAX);
                 //System.out.println((1.0 - DEFENSIVE_IMPACT * (defendingTeam.getRosterAttributeMean("Perimeter D") / Attribute.ATTRIBUTE_MAX)));
-                shotQuality *= ((1-DEFENSIVE_IMPACT) + DEFENSIVE_IMPACT * (defendingTeam.getRosterAttributeMean("Perimeter D") / Attribute.ATTRIBUTE_MAX));
+                shotQuality *= (1-DEFENSIVE_IMPACT) + DEFENSIVE_IMPACT * ((Attribute.ATTRIBUTE_MAX - defendingTeam.getRosterAttributeMean("Perimeter D")) / Attribute.ATTRIBUTE_MAX);
                 //System.out.println("before defense = " + before + " after defense= " + shotQuality);
                 //System.out.println("after defensive impact " + shotQuality);
-                make = Math.max(shotQuality * THREE_MAX, THREE_MIN) < Math.random();
+                make = Math.max(Math.min(shotQuality * THREE_MAX, 1.0), THREE_MIN) > Math.random();
+                //System.out.println("shotQuality " + shotQuality + " " + courtLocation);
                 break;
             default: return;
         }
