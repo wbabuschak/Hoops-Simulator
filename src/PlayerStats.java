@@ -3,6 +3,7 @@ import java.util.ArrayList;
 public class PlayerStats {
     private Player player;
     ArrayList<ShotAttempt> shotAttempts;
+    private int assists;
 
     public int madeThrees(){
         int cnt = 0;
@@ -31,6 +32,7 @@ public class PlayerStats {
     public PlayerStats(Player player){ 
         this.player = player;
         shotAttempts = new ArrayList<ShotAttempt>();
+        assists = 0;
     }
 
     public void logShot(ShotAttempt shotAttempt){
@@ -44,10 +46,19 @@ public class PlayerStats {
         }
         return sum;
     }
+
+    public void addAssist(){
+        assists++;
+    }
+
+    public int getAssists(){
+        return assists;
+    }
     
     public String toString(){
         String slashline = String.valueOf(getPoints());
-        slashline += "/0/0";
+        slashline += "/0/";
+        slashline += getAssists();
         int threes = madeThrees();
         String string = String.format("%-9s", slashline);
         if (fieldGoalsAttempted() > 0){

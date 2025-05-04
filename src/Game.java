@@ -118,11 +118,14 @@ public class Game {
 
     private ShotAttempt takeShot(Team shootingTeam, Team defendingTeam){
         Player shootingPlayer = shootingTeam.getRoster().chooseShooterAtRandom();
-        ShotAttempt shotAttempt = new ShotAttempt(shootingPlayer, shootingTeam, defendingTeam, shootingPlayer.getShotLocation());
+        Player assister = shootingTeam.getRoster().getAssister();
+        ShotAttempt shotAttempt = new ShotAttempt(shootingPlayer, shootingTeam, defendingTeam, shootingPlayer.getShotLocation(), assister != null);
         if (shootingTeam == team1){
             teamstats1.getPlayerStats().get(shootingTeam.getRoster().getPosition(shootingPlayer)).addShotAttempt(shotAttempt);
+            if (shotAttempt.make() > 1 && assister != null) teamstats1.getPlayerStats().get(shootingTeam.getRoster().getPosition(assister)).addAssist();
         } else if (shootingTeam == team2){
             teamstats2.getPlayerStats().get(shootingTeam.getRoster().getPosition(shootingPlayer)).addShotAttempt(shotAttempt);
+            if (shotAttempt.make() > 1 && assister != null) teamstats2.getPlayerStats().get(shootingTeam.getRoster().getPosition(assister)).addAssist();
         } else {
             System.out.println("CRITICAL ERROR: shooting team not in game");
             return null;
@@ -157,256 +160,6 @@ public class Game {
             }
         }
         return player;
-    }
-
-    public static void shootingTest(CourtLocations courtLocation, double defense){
-        Player shooter;
-        Player teammate;
-        int madeShots;
-        int trials = 10000;
-        System.out.println(courtLocation + " test, " + trials + " trials" + " one defense = " + defense);
-
-        Player foe = new Player();
-        foe.setAttributeValue("Perimeter D", defense);  
-        foe.setAttributeValue("Paint D", defense); 
-        // add opposing team 
-        Team team2 = new Team();
-        for (int i = 1; i < Roster.ROSTER_SIZE; i++){
-            team2.getRoster().addPlayer(i, foe);
-        }
-        // max skill, max gravity
-        shooter = new Player();
-        teammate = new Player();
-        Team team1 = new Team();
-        
-        TeamStats teamstats1 = new TeamStats(team1);
-        switch(courtLocation){
-            case CourtLocations.PAINT:
-                // max shooter paint
-                if (!shooter.setAttributeValue("Rim Finishing", 99)) System.err.println("Rim Finishing set error");
-                if (!shooter.setAttributeValue("Contested Rim Finishing", 99)) System.err.println("Contested Rim Finishing set error");
-                // maximize team gravity
-                if (!shooter.setAttributeValue("3pt", 99)) System.err.println("3pt set error");
-                if (!teammate.setAttributeValue("3pt", 99)) System.err.println("3pt teammate set error");
-                if (!shooter.setAttributeValue("Contested 3pt", 99)) System.err.println("Contested 3pt set error");
-                if (!teammate.setAttributeValue("Contested 3pt", 99)) System.err.println("Contested 3pt teammate set error");
-                break;
-            case CourtLocations.MIDRANGE:
-                // max shooter midrange
-                if (!shooter.setAttributeValue("Midrange", 99)) System.err.println("Midrange set error");
-                if (!shooter.setAttributeValue("Contested Midrange", 99)) System.err.println("Contested Midrange set error");
-                // maximimize team gravity
-                if (!shooter.setAttributeValue("3pt", 99)) System.err.println("3pt set error");
-                if (!teammate.setAttributeValue("3pt", 99)) System.err.println("3pt teammate set error");
-                if (!shooter.setAttributeValue("Contested 3pt", 99)) System.err.println("Contested 3pt set error");
-                if (!teammate.setAttributeValue("Contested 3pt", 99)) System.err.println("Contested 3pt teammate set error");
-                if (!shooter.setAttributeValue("Rim Finishing", 99)) System.err.println("Rim Finishing set error");
-                if (!teammate.setAttributeValue("Rim Finishing", 99)) System.err.println("Rim Finishing teammate set error");
-                if (!shooter.setAttributeValue("Contested Rim Finishing", 99)) System.err.println("Contested Rim Finishing set error");
-                if (!teammate.setAttributeValue("Contested Rim Finishing", 99)) System.err.println("Contested Rim Finishing teammate set error");
-                break;
-            case CourtLocations.THREE:
-                // max shooter 3pt
-                if (!shooter.setAttributeValue("3pt", 99)) System.err.println("3pt set error");
-                if (!shooter.setAttributeValue("Contested 3pt", 99)) System.err.println("Contested 3pt set error");
-                // maximimize team gravity
-                if (!shooter.setAttributeValue("Rim Finishing", 99)) System.err.println("Rim Finishing set error");
-                if (!teammate.setAttributeValue("Rim Finishing", 99)) System.err.println("Rim Finishing teammate set error");
-                if (!shooter.setAttributeValue("Contested Rim Finishing", 99)) System.err.println("Contested Rim Finishing set error");
-                if (!teammate.setAttributeValue("Contested Rim Finishing", 99)) System.err.println("Contested Rim Finishing teammate set error");
-                
-                break;
-            case CourtLocations.FT:
-                if (!shooter.setAttributeValue("Free Throw", 99)) System.err.println("Free Throw set error");
-                break;
-            default: 
-                return;
-        }
-        // add shooter and teammates      
-        team1.getRoster().addPlayer(0, shooter);
-        for (int i = 1; i < Roster.ROSTER_SIZE; i++){
-            team1.getRoster().addPlayer(i, teammate);
-        }
-        // run test
-        madeShots = 0;
-        for (int i = 0; i < trials; i++){
-            if (teamstats1.changeScore(new ShotAttempt(shooter, team1, team2, courtLocation))){
-                madeShots++;
-            }
-        }
-        System.out.printf("\tMade %4d out of %5d %s shot attempts %05.2f%% (max player, max gravity)\n", madeShots, trials, courtLocation.name(), 100.0 * madeShots / trials);
-        if (courtLocation == CourtLocations.FT) return;
-        
-        // max skill, min gravity
-        shooter = new Player();
-        teammate = new Player();
-        team1 = new Team();
-        teamstats1 = new TeamStats(team1);
-        switch(courtLocation){
-            case CourtLocations.PAINT:
-                // max shooter paint
-                if (!shooter.setAttributeValue("Rim Finishing", 99)) System.err.println("Rim Finishing set error");
-                if (!shooter.setAttributeValue("Contested Rim Finishing", 99)) System.err.println("Contested Rim Finishing set error");
-                // minimize team gravity
-                if (!shooter.setAttributeValue("3pt", 00)) System.err.println("3pt set error");
-                if (!teammate.setAttributeValue("3pt", 00)) System.err.println("3pt teammate set error");
-                if (!shooter.setAttributeValue("Contested 3pt", 00)) System.err.println("Contested 3pt set error");
-                if (!teammate.setAttributeValue("Contested 3pt", 00)) System.err.println("Contested 3pt teammate set error");
-                break;
-            case CourtLocations.MIDRANGE:
-                // max shooter midrange
-                if (!shooter.setAttributeValue("Midrange", 99)) System.err.println("Midrange set error");
-                if (!shooter.setAttributeValue("Contested Midrange", 99)) System.err.println("Contested Midrange set error");
-                // minimize team gravity
-                if (!shooter.setAttributeValue("3pt", 00)) System.err.println("3pt set error");
-                if (!teammate.setAttributeValue("3pt", 00)) System.err.println("3pt teammate set error");
-                if (!shooter.setAttributeValue("Contested 3pt", 00)) System.err.println("Contested 3pt set error");
-                if (!teammate.setAttributeValue("Contested 3pt", 00)) System.err.println("Contested 3pt teammate set error");
-                if (!shooter.setAttributeValue("Rim Finishing", 00)) System.err.println("Rim Finishing set error");
-                if (!teammate.setAttributeValue("Rim Finishing", 00)) System.err.println("Rim Finishing teammate set error");
-                if (!shooter.setAttributeValue("Contested Rim Finishing", 00)) System.err.println("Contested Rim Finishing set error");
-                if (!teammate.setAttributeValue("Contested Rim Finishing", 00)) System.err.println("Contested Rim Finishing teammate set error");
-                break;
-            case CourtLocations.THREE:
-                // max shooter 3pt
-                if (!shooter.setAttributeValue("3pt", 99)) System.err.println("3pt set error");
-                if (!shooter.setAttributeValue("Contested 3pt", 99)) System.err.println("Contested 3pt set error");
-                // minimize team gravity
-                if (!shooter.setAttributeValue("Rim Finishing", 00)) System.err.println("Rim Finishing set error");
-                if (!teammate.setAttributeValue("Rim Finishing", 00)) System.err.println("Rim Finishing teammate set error");
-                if (!shooter.setAttributeValue("Contested Rim Finishing", 00)) System.err.println("Contested Rim Finishing set error");
-                if (!teammate.setAttributeValue("Contested Rim Finishing", 00)) System.err.println("Contested Rim Finishing teammate set error");
-                break;
-            default: 
-                return;
-        }
-        // add shooter and teammates      
-        team1.getRoster().addPlayer(0, shooter);
-        for (int i = 1; i < Roster.ROSTER_SIZE; i++){
-            team1.getRoster().addPlayer(i, teammate);
-        }
-        // run test
-        madeShots = 0;
-        for (int i = 0; i < trials; i++){
-            if (teamstats1.changeScore(new ShotAttempt(shooter, team1, team2, courtLocation))){
-                madeShots++;
-            }
-        }
-        System.out.printf("\tMade %4d out of %5d %s shot attempts %05.2f%% (max player, min gravity)\n", madeShots, trials, courtLocation.name(), 100.0 * madeShots / trials);
-        // no skill, max gravity
-        shooter = new Player();
-        teammate = new Player();
-        team1 = new Team();
-        teamstats1 = new TeamStats(team1);
-        switch(courtLocation){
-            case CourtLocations.PAINT:
-                // min shooter paint
-                if (!shooter.setAttributeValue("Rim Finishing", 00)) System.err.println("Rim Finishing set error");
-                if (!shooter.setAttributeValue("Contested Rim Finishing", 00)) System.err.println("Contested Rim Finishing set error");
-                // maximize team gravity
-                if (!shooter.setAttributeValue("3pt", 99)) System.err.println("3pt set error");
-                if (!teammate.setAttributeValue("3pt", 99)) System.err.println("3pt teammate set error");
-                if (!shooter.setAttributeValue("Contested 3pt", 99)) System.err.println("Contested 3pt set error");
-                if (!teammate.setAttributeValue("Contested 3pt", 99)) System.err.println("Contested 3pt teammate set error");
-                break;
-            case CourtLocations.MIDRANGE:
-                // min shooter midrange
-                if (!shooter.setAttributeValue("Midrange", 00)) System.err.println("Midrange set error");
-                if (!shooter.setAttributeValue("Contested Midrange", 00)) System.err.println("Contested Midrange set error");
-                // maximize team gravity
-                if (!shooter.setAttributeValue("3pt", 99)) System.err.println("3pt set error");
-                if (!teammate.setAttributeValue("3pt", 99)) System.err.println("3pt teammate set error");
-                if (!shooter.setAttributeValue("Contested 3pt", 99)) System.err.println("Contested 3pt set error");
-                if (!teammate.setAttributeValue("Contested 3pt", 99)) System.err.println("Contested 3pt teammate set error");
-                if (!shooter.setAttributeValue("Rim Finishing", 99)) System.err.println("Rim Finishing set error");
-                if (!teammate.setAttributeValue("Rim Finishing", 99)) System.err.println("Rim Finishing teammate set error");
-                if (!shooter.setAttributeValue("Contested Rim Finishing", 99)) System.err.println("Contested Rim Finishing set error");
-                if (!teammate.setAttributeValue("Contested Rim Finishing", 99)) System.err.println("Contested Rim Finishing teammate set error");
-                break;
-            case CourtLocations.THREE:
-                // min shooter 3pt
-                if (!shooter.setAttributeValue("3pt", 00)) System.err.println("3pt set error");
-                if (!shooter.setAttributeValue("Contested 3pt", 00)) System.err.println("Contested 3pt set error");
-                // maximize team gravity
-                if (!shooter.setAttributeValue("Rim Finishing", 99)) System.err.println("Rim Finishing set error");
-                if (!teammate.setAttributeValue("Rim Finishing", 99)) System.err.println("Rim Finishing teammate set error");
-                if (!shooter.setAttributeValue("Contested Rim Finishing", 99)) System.err.println("Contested Rim Finishing set error");
-                if (!teammate.setAttributeValue("Contested Rim Finishing", 99)) System.err.println("Contested Rim Finishing teammate set error");
-                break;
-            default: 
-                return;
-        }
-        // add shooter and teammates      
-        team1.getRoster().addPlayer(0, shooter);
-        for (int i = 1; i < Roster.ROSTER_SIZE; i++){
-            team1.getRoster().addPlayer(i, teammate);
-        }
-        // run test
-        madeShots = 0;
-        for (int i = 0; i < trials; i++){
-            if (teamstats1.changeScore(new ShotAttempt(shooter, team1, team2, courtLocation))){
-                madeShots++;
-            }
-        }
-        System.out.printf("\tMade %4d out of %5d %s shot attempts %05.2f%% (min player, max gravity)\n", madeShots, trials, courtLocation.name(), 100.0 * madeShots / trials);
-        // no skill, no gravity
-        shooter = new Player();
-        teammate = new Player();
-        team1 = new Team();
-        teamstats1 = new TeamStats(team1);
-        switch(courtLocation){
-            case CourtLocations.PAINT:
-                // min shooter paint
-                if (!shooter.setAttributeValue("Rim Finishing", 00)) System.err.println("Rim Finishing set error");
-                if (!shooter.setAttributeValue("Contested Rim Finishing", 00)) System.err.println("Contested Rim Finishing set error");
-                // maximize team gravity
-                if (!shooter.setAttributeValue("3pt", 00)) System.err.println("3pt set error");
-                if (!teammate.setAttributeValue("3pt", 00)) System.err.println("3pt teammate set error");
-                if (!shooter.setAttributeValue("Contested 3pt", 00)) System.err.println("Contested 3pt set error");
-                if (!teammate.setAttributeValue("Contested 3pt", 00)) System.err.println("Contested 3pt teammate set error");
-                break;
-            case CourtLocations.MIDRANGE:
-                // min shooter midrange
-                if (!shooter.setAttributeValue("Midrange", 00)) System.err.println("Midrange set error");
-                if (!shooter.setAttributeValue("Contested Midrange", 00)) System.err.println("Contested Midrange set error");
-                // maximize team gravity
-                if (!shooter.setAttributeValue("3pt", 00)) System.err.println("3pt set error");
-                if (!teammate.setAttributeValue("3pt", 00)) System.err.println("3pt teammate set error");
-                if (!shooter.setAttributeValue("Contested 3pt", 00)) System.err.println("Contested 3pt set error");
-                if (!teammate.setAttributeValue("Contested 3pt", 00)) System.err.println("Contested 3pt teammate set error");
-                if (!shooter.setAttributeValue("Rim Finishing", 00)) System.err.println("Rim Finishing set error");
-                if (!teammate.setAttributeValue("Rim Finishing", 00)) System.err.println("Rim Finishing teammate set error");
-                if (!shooter.setAttributeValue("Contested Rim Finishing", 00)) System.err.println("Contested Rim Finishing set error");
-                if (!teammate.setAttributeValue("Contested Rim Finishing", 00)) System.err.println("Contested Rim Finishing teammate set error");
-                break;
-            case CourtLocations.THREE:
-                // min shooter 3pt
-                if (!shooter.setAttributeValue("3pt", 00)) System.err.println("3pt set error");
-                if (!shooter.setAttributeValue("Contested 3pt", 00)) System.err.println("Contested 3pt set error");
-                // maximize team gravity
-                if (!shooter.setAttributeValue("Rim Finishing", 00)) System.err.println("Rim Finishing set error");
-                if (!teammate.setAttributeValue("Rim Finishing", 00)) System.err.println("Rim Finishing teammate set error");
-                if (!shooter.setAttributeValue("Contested Rim Finishing", 00)) System.err.println("Contested Rim Finishing set error");
-                if (!teammate.setAttributeValue("Contested Rim Finishing", 00)) System.err.println("Contested Rim Finishing teammate set error");
-                break;
-            default: 
-                return;
-        }
-        // add shooter and teammates      
-        team1.getRoster().addPlayer(0, shooter);
-        for (int i = 1; i < Roster.ROSTER_SIZE; i++){
-            team1.getRoster().addPlayer(i, teammate);
-        }
-
-        // run test
-        madeShots = 0;
-        for (int i = 0; i < trials; i++){
-            if (teamstats1.changeScore(new ShotAttempt(shooter, team1, team2, courtLocation))){
-                madeShots++;
-            }
-        }
-        System.out.printf("\tMade %4d out of %5d %s shot attempts %05.2f%% (min player, min gravity)\n", madeShots, trials, courtLocation.name(), 100.0 * madeShots / trials);
-        
     }
 
     public String toString(){
@@ -500,6 +253,8 @@ public class Game {
         
         return string;
     }
+
+    
 }
 
 

@@ -1,6 +1,8 @@
+import org.w3c.dom.Attr;
+
 public class ShotAttempt {
     /**
-     * The best possible shot attempt at the rim has a 90% chance of going in
+     * 
      */
     public static final double RIM_SHOT_MAX = 1.5;
     /**
@@ -16,7 +18,7 @@ public class ShotAttempt {
      */
     public static final double FT_MIN = 0.35;
     /**
-     * The best possible shot attempt from three has a 50% chance of going in
+     * 
      */
     public static final double THREE_MAX = 0.85;
     /**
@@ -24,9 +26,14 @@ public class ShotAttempt {
      */
     public static final double THREE_MIN = 0.01;
     /**
-     * The greatest possible defensive impact is 0
+     * The greatest possible defensive impact is 1
      */
     public static final double DEFENSIVE_IMPACT = 0.75;
+
+    /**
+     * The greatest possible assist impact is 1 (i.e. assisted shots are always max skill)
+     */
+    public static final double ASSIST_EFFECT = 0.5;
     
 
     private Player player;
@@ -35,7 +42,7 @@ public class ShotAttempt {
     private CourtLocations courtLocation;
     private boolean make;
 
-    public ShotAttempt(Player player, Team shootingTeam, Team defendingTeam, CourtLocations courtLocation){
+    public ShotAttempt(Player player, Team shootingTeam, Team defendingTeam, CourtLocations courtLocation, boolean assisted){
         this.player = player;
         this.shootingTeam = shootingTeam;
         this.defendingTeam = defendingTeam;
@@ -44,7 +51,7 @@ public class ShotAttempt {
         double shotQuality = 0.0;
         double gravitySharpness = 0.15;
         boolean contested;
-        double shootingSkill;
+        double shootingSkill = 0.0;
         switch(courtLocation){
             case CourtLocations.FT:
                 // shot quality based strictly on shooter's FT skill
@@ -57,6 +64,7 @@ public class ShotAttempt {
                 // if shots are contested, use the lower of contested and non-contested paint skill
                 shootingSkill = !contested ? player.getAttributeValue("Rim Finishing") : Math.min(player.getAttributeValue("Rim Finishing"),player.getAttributeValue("Contested Rim Finishing"));
                 shotQuality = shootingSkill;
+                if (assisted) shotQuality += (Attribute.ATTRIBUTE_MAX - shootingSkill) * (ASSIST_EFFECT);
                 // adjust for team gravity, 3:1 weighting for player skill vs team 3pt gravity
                 shotQuality = (
                     3.0 * (shootingSkill / Attribute.ATTRIBUTE_MAX) +
@@ -75,6 +83,7 @@ public class ShotAttempt {
                 // if shots are contested, use the lower of contested and non-contested midrange skill
                 shootingSkill = !contested ? player.getAttributeValue("Midrange") : Math.min(player.getAttributeValue("Midrange"),player.getAttributeValue("Contested Midrange"));
                 shotQuality = shootingSkill;
+                if (assisted) shotQuality += (Attribute.ATTRIBUTE_MAX - shootingSkill) * (ASSIST_EFFECT);
                 // adjust for team gravity, 6:1:1 weighting for player skill vs team 3pt gravity vs team rim gravity
                 shotQuality = 
                 (6.0 * (player.getAttributeValue("Midrange") / Attribute.ATTRIBUTE_MAX) 
@@ -96,6 +105,7 @@ public class ShotAttempt {
                 // if shots are contested, use the lower of contested and non-contested 3pt skill
                 shootingSkill = !contested ? player.getAttributeValue("3pt") : Math.min(player.getAttributeValue("3pt"),player.getAttributeValue("Contested 3pt"));
                 shotQuality = shootingSkill;
+                if (assisted) shotQuality += (Attribute.ATTRIBUTE_MAX - shootingSkill) * (ASSIST_EFFECT);
                 //System.out.println("after decision " + shootingSkill);
                 // adjust for team gravity, 3:1 weighting for player skill vs team rim gravity
                 shotQuality = (
@@ -115,7 +125,9 @@ public class ShotAttempt {
                 //System.out.println("shotQuality " + shotQuality + " " + courtLocation);
                 break;
             default: return;
+            
         }
+        
     }
 
     /**
