@@ -182,10 +182,10 @@ public class Roster {
 
     public int calculateRosterMinutes(int i) {
         if (i < 5) {
-            return 32;
+            return 28;
         }
 
-        return Math.max((int) (24 - 5.43 * (i - 5)), 0);
+        return Math.max((int) (20 - 3 * (i - 5)), 0);
     }
 
 
@@ -220,5 +220,31 @@ public class Roster {
         // should never occur
         return null;
 
+    }
+
+    public Player getAssister(){
+        double total = 0.0;
+        for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
+            if (getMinutes()[i] == 0){
+                continue;
+            }
+            total += Math.pow(getMinutes()[i], 2) * getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE;
+        }
+        double r = Math.random() * total;
+        double cumulative = 0.0;
+
+        for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
+            if (getMinutes()[i] == 0){
+                continue;
+            }
+            cumulative += Math.pow(getMinutes()[i], 2) * getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE;
+            if (r <= cumulative) {
+                if ((getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_MAX > Math.random())){
+                    return getPlayer(i);
+                }
+            }
+        }
+        // returns null if no player is credited with assist
+        return null;
     }
 }
