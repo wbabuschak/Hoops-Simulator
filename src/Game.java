@@ -34,9 +34,6 @@ public class Game {
         if (trials < 1) return;
         Game game = new Game(Team.randomTeam(), Team.randomTeam());
         
-        int cnt1 = 0;
-        int cnt2 = 0;
-        int possessions = 0;
         for (int i = 0; i < trials; i++){
             game = new Game(Team.randomTeam(), Team.randomTeam());
             if (!(team1Shooting == -1 || team1Defense == -1 ||  team2Shooting == -1|| team2Defense == -1)){
@@ -58,12 +55,6 @@ public class Game {
             }
            
             game.playGame();
-            
-            possessions+= game.getPossessions();
-
-            cnt1 += game.teamstats1.getScore();
-            
-            cnt2 += game.teamstats2.getScore();
 
             if (extra){
                 System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
@@ -72,9 +63,6 @@ public class Game {
             
 
         }
-        // System.out.println("team1Shooting " + team1Shooting + " team1Defense " + team1Defense + " team2Shooting " + team2Shooting + " team2Defense " + team2Defense + " Total score = " + cnt1 + " - " + cnt2);
-        // System.out.println("team1 PPP = " + ((double) cnt1 / (double) possessions));
-        // System.out.println("team2 PPP = " + ((double) cnt2 / (double) possessions));
     }
 
 
@@ -151,7 +139,32 @@ public class Game {
             }
         } else if (getWinner() == team2){
             for (int i = 0; i < team2.getRoster().noPlayers(); i++){
-                int t = teamstats1.getPlayerStats().get(i).getPoints();
+                int t = teamstats2.getPlayerStats().get(i).getPoints();
+                // System.out.println("\t DEBUG: " + team1.getRoster().getPlayer(i).getName() + " " + t + " points.");
+                if (t > max){
+                    player = team2.getRoster().getPlayer(i);
+                    max = t;
+                }
+            }
+        }
+        return player;
+    }
+
+    public Player getPOTG(){
+        Player player = null;
+        double max = 0;
+        if (getWinner() == team1){
+            for (int i = 0; i < team1.getRoster().noPlayers(); i++){
+                double t = teamstats1.getPlayerStats().get(i).calculateBPER();
+                // System.out.println("\t DEBUG: " + team1.getRoster().getPlayer(i).getName() + " " + t + " points.");
+                if (t > max){
+                    player = team1.getRoster().getPlayer(i);
+                    max = t;
+                }
+            }
+        } else if (getWinner() == team2){
+            for (int i = 0; i < team2.getRoster().noPlayers(); i++){
+                double t = teamstats1.getPlayerStats().get(i).calculateBPER();
                 // System.out.println("\t DEBUG: " + team1.getRoster().getPlayer(i).getName() + " " + t + " points.");
                 if (t > max){
                     player = team2.getRoster().getPlayer(i);
@@ -172,20 +185,20 @@ public class Game {
             string += teamstats1.getScore(); 
             string += "-";
             string += teamstats2.getScore();
-            string += "\n\t High Scorer: ";
-            string += getHighScorer().getName();
+            string += "\n\t Player of the game: ";
+            string += getPOTG().getName();
             string += " ";
-            string += teamstats1.getStatsFromPlayer(getHighScorer()).toString();
+            string += teamstats1.getStatsFromPlayer(getPOTG()).toString();
         } else {
             string = team2.getName();
             string += " won ";
             string += teamstats2.getScore(); 
             string += "-";
             string += teamstats1.getScore();
-            string += "\n\t High Scorer: ";
-            string += getHighScorer().getName();
+            string += "\n\t Player of the game: ";
+            string += getPOTG().getName();
             string += " ";
-            string += teamstats2.getStatsFromPlayer(getHighScorer()).toString();
+            string += teamstats2.getStatsFromPlayer(getPOTG()).toString();
         }
         
         
@@ -220,10 +233,8 @@ public class Game {
                 string += "-";
                 string += teamstats2.getScore();
                 string += "\n\n";
-                string += "High Scorer: ";
-                string += getHighScorer().getName();
-                string += " ";
-                string += teamstats1.getStatsFromPlayer(getHighScorer()).toString();
+                string += "Player of the game: ";
+                string += getPOTG().getName();
                 string += "\n\n";
                 string += team1.getName();
                 string += "\n\n";
@@ -238,6 +249,9 @@ public class Game {
                 string += teamstats2.getScore(); 
                 string += "-";
                 string += teamstats1.getScore();
+                string += "\n\n";
+                string += "Player of the game: ";
+                string += getPOTG().getName();
                 string += "\n\n";
                 string += team2.getName();
                 string += "\n\n";

@@ -2,6 +2,8 @@ public class Roster {
     public static final int ROSTER_SIZE = 12;
     public static boolean forceRosterLimit = false;
     public static double skillReliance = 1.0;
+    public static final int MINUTES_RFACTOR = 5;
+    public static final double ASSIST_RATE = 0.7;
 
     private int[] minutes = {};
     private Player[] players;
@@ -143,9 +145,14 @@ public class Roster {
         for (int i = 0; i < ROSTER_SIZE; i++){
             minutes[i] = calculateRosterMinutes(i);
         }
+        initializeMinutes();
     }
 
     public int[] getMinutes(){
+        return minutes;
+    }
+
+    public void initializeMinutes(){
         int existingSum = 0;
         int[] fetch = new int[ROSTER_SIZE];
         for (int i = 0; i < ROSTER_SIZE; i++){
@@ -155,37 +162,59 @@ public class Roster {
         for (int i = 0; i < ROSTER_SIZE; i++){
             fetch[i] =  (int) ((double) 5 * Game.GAME_LENGTH * minutes[i] / (double)existingSum);
             currentSum += fetch[i];
-        }   
+        }
+        
+        for (int i = 0; i < ROSTER_SIZE; i++){
+            for (int j = 0; j < MINUTES_RFACTOR; j++){
+                int k = 1 - (int) (2.0 * Math.random());
+                fetch[i] += k;
+                currentSum += k;
+            }
+        }
+
+        for (int i = 0; i < ROSTER_SIZE; i++){
+            if (fetch[i] < 0){
+                fetch[i] = 0;
+            }
+        }
         
         for (int i = 0; currentSum < 5 * Game.GAME_LENGTH; i++){
-            fetch[i % 5]++;
+            fetch[i % ROSTER_SIZE]++;
             currentSum++;
         }
         
-        for (int i = ROSTER_SIZE - 1; currentSum < 5 * Game.GAME_LENGTH; i--){
-            if (currentSum > 5 * Game.GAME_LENGTH){
-                while (fetch[i] > 0){
-                    fetch[i]--;
-                    currentSum--;
-                    if (currentSum == 5 * Game.GAME_LENGTH){
-                        break;
-                    }
-                }
-
+        for (int i = 0; currentSum > 5 * Game.GAME_LENGTH; i++){
+            if (fetch[i % ROSTER_SIZE] > 0){
+                fetch[i % ROSTER_SIZE]--;
+                currentSum--;
             }
-            
         }
 
+        for (int i = 0; i < ROSTER_SIZE; i++){
+            if (fetch[i] < 5 && Math.random() * fetch[i] < 1){
+                currentSum-= fetch[i];
+                fetch[i] = 0;
+                
+            }
+        }
+
+        for (int i = 0; currentSum < 5 * Game.GAME_LENGTH; i++){
+            fetch[i % ROSTER_SIZE]++;
+            currentSum++;
+        }
         
-        return fetch;
+        for (int i = 0; i < ROSTER_SIZE; i++){
+            
+        }
+        minutes = fetch;
     }
 
     public int calculateRosterMinutes(int i) {
         if (i < 5) {
-            return 28;
+            return 30;
         }
 
-        return Math.max((int) (20 - 3 * (i - 5)), 0);
+        return Math.max((int) (20 - 4 * (i - 5)), 0);
     }
 
 
@@ -239,7 +268,7 @@ public class Roster {
             }
             cumulative += Math.pow(getMinutes()[i], 2) * getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE;
             if (r <= cumulative) {
-                if ((getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_MAX > Math.random())){
+                if (((getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_MAX) * ASSIST_RATE > Math.random())){
                     return getPlayer(i);
                 }
             }

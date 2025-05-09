@@ -1,9 +1,13 @@
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class PlayerStats {
     private Player player;
     ArrayList<ShotAttempt> shotAttempts;
     private int assists;
+    private int turnovers;
+    private int oRebounds;
+    private int dRebounds;
 
     public int madeThrees(){
         int cnt = 0;
@@ -16,7 +20,11 @@ public class PlayerStats {
     }
 
     public int fieldGoalsAttempted(){
-        return shotAttempts.size();
+        int cnt = 0;
+        for (int i = 0; i < shotAttempts.size(); i++){
+            if (shotAttempts.get(i).getCourtLocation() != CourtLocations.FT) cnt++;
+        }
+        return cnt;
     }
 
     public int fieldGoalsMade(){
@@ -33,6 +41,7 @@ public class PlayerStats {
         this.player = player;
         shotAttempts = new ArrayList<ShotAttempt>();
         assists = 0;
+        turnovers = 0;
     }
 
     public void logShot(ShotAttempt shotAttempt){
@@ -54,13 +63,44 @@ public class PlayerStats {
     public int getAssists(){
         return assists;
     }
+
+    public int getTurnovers(){
+        return turnovers;
+    }
+
+    public int getORebounds(){
+        return oRebounds;
+    }
+
+    public int getDRebounds(){
+        return dRebounds;
+    }
+
+    public int getRebounts(){
+        return oRebounds + dRebounds;
+    }
+
+    public double calculateBPER(){
+        int FGA = fieldGoalsAttempted();
+        int FTA = shotAttempts.size() - FGA;
+        int PTS = getPoints();
+        int OREB = getORebounds();
+        int DREB = getDRebounds();
+        int ASS = getAssists();
+        int TO = getTurnovers();
+
+        return (double) (2 * PTS - 0.5 * FTA - FGA + 0.5 * DREB + 1.5 * OREB + ASS - 2.0 * TO);
+    }
     
     public String toString(){
+        String string = "BPER: ";
+        string += String.format("%-6s", new DecimalFormat("0.00").format(calculateBPER()));
+        string += " | ";
         String slashline = String.valueOf(getPoints());
         slashline += "/0/";
         slashline += getAssists();
         int threes = madeThrees();
-        String string = String.format("%-9s", slashline);
+        string += String.format("%-9s", slashline);
         if (fieldGoalsAttempted() > 0){
             String fg = "| ";
             fg += fieldGoalsMade();

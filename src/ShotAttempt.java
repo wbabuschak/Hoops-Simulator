@@ -42,6 +42,11 @@ public class ShotAttempt {
     private CourtLocations courtLocation;
     private boolean make;
 
+
+    public CourtLocations getCourtLocation(){
+        return courtLocation;
+    }
+
     public ShotAttempt(Player player, Team shootingTeam, Team defendingTeam, CourtLocations courtLocation, boolean assisted){
         this.player = player;
         this.shootingTeam = shootingTeam;
