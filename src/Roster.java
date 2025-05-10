@@ -3,7 +3,7 @@ public class Roster {
     public static boolean forceRosterLimit = false;
     public static double skillReliance = 1.0;
     public static final int MINUTES_RFACTOR = 5;
-    public static final double ASSIST_RATE = 0.7;
+    public static final double ASSIST_RATE = 0.5;
 
     private int[] minutes = {};
     private Player[] players;
@@ -249,6 +249,57 @@ public class Roster {
         // should never occur
         return null;
 
+    }
+
+    public Player getOffensiveRebounder(){
+        double total = 0.0;
+        for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
+            if (getMinutes()[i] == 0){
+                continue;
+            }
+            total += Math.pow(getMinutes()[i], 2) * getPlayer(i).getAttributeValue("Offensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
+        }
+        double r = Math.random() * total;
+        double cumulative = 0.0;
+
+        for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
+            if (getMinutes()[i] == 0){
+                continue;
+            }
+            cumulative += Math.pow(getMinutes()[i], 2) * getPlayer(i).getAttributeValue("Offensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
+            if (r <= cumulative) {
+                return getPlayer(i);
+            }
+        }
+        // should never return null
+        return null;
+    }
+
+        public Player getDefensiveRebounder(){
+        double total = 0.0;
+        for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
+            if (getMinutes()[i] == 0){
+                continue;
+            }
+            //System.out.println("total: " + total);
+            total += Math.pow(getMinutes()[i], 2) * getPlayer(i).getAttributeValue("Defensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
+        }
+        double r = Math.random() * total;
+        double cumulative = 0.0;
+
+        
+        for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
+            if (getMinutes()[i] == 0){
+                continue;
+            }
+            //System.out.println("cumulative: " + cumulative);
+            cumulative += Math.pow(getMinutes()[i], 2) * getPlayer(i).getAttributeValue("Defensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
+            if (r <= cumulative) {
+                return getPlayer(i);
+            }
+        }
+        //System.out.println("DEBUG");
+        return null;
     }
 
     public Player getAssister(){

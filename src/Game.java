@@ -93,16 +93,44 @@ public class Game {
 
     private void runPossession(){
         if (Math.random() > TURNOVER_RATE + TURNOVER_SCALAR * (Attribute.ATTRIBUTE_MAX - team1.getRosterAttributeMean("Offensive Discipline"))/Attribute.ATTRIBUTE_MAX){
-            teamstats1.changeScore(takeShot(team1, team2));
+            while (teamstats1.changeScore(takeShot(team1, team2)) == false){
+                if (!rebound(team1, teamstats1, team2, teamstats2)){
+                    break;
+                }
+            }
+            
         } else {
             teamstats1.turnover();
         }
         if (Math.random() > TURNOVER_RATE + TURNOVER_SCALAR * (Attribute.ATTRIBUTE_MAX - team2.getRosterAttributeMean("Offensive Discipline"))/Attribute.ATTRIBUTE_MAX){
-            teamstats2.changeScore(takeShot(team2, team1));
+            while (teamstats2.changeScore(takeShot(team2, team1)) == false){
+                if (!rebound(team2, teamstats2, team1, teamstats1)){
+                    break;
+                }
+            }
         } else {
             teamstats2.turnover();
         }
     }
+
+    /**
+     * 
+     * @param shootingTeam
+     * @param defendingTeam
+     * @return whether an offensive rebound is taken
+     */
+    private boolean rebound(Team shootingTeam, TeamStats shootingTeamStats, Team defendingTeam, TeamStats defendingTeamStats){
+        Player oRebounder = shootingTeam.getRoster().getOffensiveRebounder();
+        Player dRebounder = defendingTeam.getRoster().getDefensiveRebounder();
+        if (oRebounder.getAttributeValue("Offensive Rebounding") * Math.random() > dRebounder.getAttributeValue("Defensive Rebounding") * 3.0 * Math.random()){
+            shootingTeamStats.getPlayerStats().get(shootingTeam.getRoster().getPosition(oRebounder)).incrementORebound();
+            return true;
+        } else {
+            defendingTeamStats.getPlayerStats().get(defendingTeam.getRoster().getPosition(dRebounder)).incrementDRebound();
+        }
+        return false;
+    }
+    
 
     private ShotAttempt takeShot(Team shootingTeam, Team defendingTeam){
         Player shootingPlayer = shootingTeam.getRoster().chooseShooterAtRandom();

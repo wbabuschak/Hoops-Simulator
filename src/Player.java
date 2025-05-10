@@ -89,6 +89,8 @@ public class Player {
         attributes.add(new Attribute("Offensive Discipline", 0.0));
         attributes.add(new Attribute("Defensive Discipline", 0.0));
         attributes.add(new Attribute("Dribbling", 0.0));
+        attributes.add(new Attribute("Offensive Rebounding", 0.0));
+        attributes.add(new Attribute("Defensive Rebounding", 0.0));
     }
 
     public static Player randomPlayer(){

@@ -76,8 +76,16 @@ public class PlayerStats {
         return dRebounds;
     }
 
-    public int getRebounts(){
+    public int getRebounds(){
         return oRebounds + dRebounds;
+    }
+
+    public void incrementORebound(){
+        oRebounds++;
+    }
+
+    public void incrementDRebound(){
+        dRebounds++;
     }
 
     public double calculateBPER(){
@@ -97,7 +105,9 @@ public class PlayerStats {
         string += String.format("%-6s", new DecimalFormat("0.00").format(calculateBPER()));
         string += " | ";
         String slashline = String.valueOf(getPoints());
-        slashline += "/0/";
+        slashline += "/";
+        slashline += getRebounds();
+        slashline += "/";
         slashline += getAssists();
         int threes = madeThrees();
         string += String.format("%-9s", slashline);
@@ -107,14 +117,22 @@ public class PlayerStats {
             fg += "/";
             fg += fieldGoalsAttempted();
             fg += " FG";
-            if (threes > 0) fg += ", ";
-            string += String.format("%-11s",fg);
+            string += fg;
         }
         
         if (madeThrees() > 0){
+            string += ", ";
             string += threes;
             string += " 3pt";
         }
+
+        if (getORebounds() > 0){
+            string += ", ";
+            string += getORebounds();
+            string += " OREB";
+        }
+        
+
         return string;
     }
 

@@ -12,7 +12,7 @@ public class TeamStats {
     public boolean changeScore(ShotAttempt shotAttempt){
         //if (shotAttempt.make() != 0){System.out.println(shotAttempt.getShooter().getName() + " scored " + shotAttempt.make() + "!");}
         score += shotAttempt.make();
-        return shotAttempt.make() == 0;
+        return shotAttempt.make() != 0;
     }
 
     public int getScore(){
@@ -37,6 +37,22 @@ public class TeamStats {
         return playerStats.get(pos);
     }
 
+    public int teamRebouds(){
+        int cnt = 0;
+        for (int i = 0; i < playerStats.size(); i++){
+            cnt += playerStats.get(i).getRebounds();
+        }
+        return cnt;
+    }
+
+    public int teamAssists(){
+        int cnt = 0;
+        for (int i = 0; i < playerStats.size(); i++){
+            cnt += playerStats.get(i).getAssists();
+        }
+        return cnt;
+    }
+
     public String toString(){
         String string = "";
         for (int i = 0; i < team.getRoster().noPlayers(); i++){
@@ -53,7 +69,11 @@ public class TeamStats {
             string += "\n";
         }
         string += getTurnovers();
-        string += " team TO\n";
+        string += " team TO | ";
+        string += teamAssists();
+        string += " team Assists | ";
+        string += teamRebouds();
+        string += " team Rebounds\n";
         return string;
     }
 
