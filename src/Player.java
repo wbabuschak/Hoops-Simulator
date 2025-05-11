@@ -91,9 +91,11 @@ public class Player {
         attributes.add(new Attribute("Dribbling", 0.0));
         attributes.add(new Attribute("Offensive Rebounding", 0.0));
         attributes.add(new Attribute("Defensive Rebounding", 0.0));
+        attributes.add(new Attribute("Hard Fouls", 0.0));
     }
 
     public static Player randomPlayer(){
+        double overall = Math.random() * Attribute.ATTRIBUTE_MAX;
         Player player = new Player();
         player.name = randomName();
         player.height = -1;
@@ -101,7 +103,7 @@ public class Player {
         player.age = -1;
         
         for (int i = 0; i < player.getAttributes().size(); i++){
-            double attValue = 100 * Math.random();
+            double attValue = overall + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2 - Math.random() * overall / 2;
             player.getAttributes().get(i).setValue(attValue);
         }
         return player;
@@ -116,6 +118,14 @@ public class Player {
      */
     public ArrayList<Attribute> getAttributes(){
         return attributes;
+    }
+
+    public double overall(){
+        double sum = 0;
+        for (int i = 0; i < attributes.size(); i++){
+            sum += attributes.get(i).getValue();
+        }
+        return sum / (double) attributes.size();
     }
 
     public String toString(){

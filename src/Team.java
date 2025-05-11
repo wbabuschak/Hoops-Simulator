@@ -34,6 +34,7 @@ public class Team {
         for (int i = 0; i < Roster.ROSTER_SIZE; i++){
             team.getRoster().addPlayer(i, Player.randomPlayer());
         }
+        team.getRoster().sort();
         return team;
     }
 

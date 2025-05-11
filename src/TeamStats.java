@@ -45,6 +45,46 @@ public class TeamStats {
         return cnt;
     }
 
+    public int teamFGA(){
+        int cnt = 0;
+        for (int i = 0; i < playerStats.size(); i++){
+            cnt += playerStats.get(i).fieldGoalsAttempted();
+        }
+        return cnt;
+    }
+
+    public int teamFGM(){
+        int cnt = 0;
+        for (int i = 0; i < playerStats.size(); i++){
+            cnt += playerStats.get(i).fieldGoalsMade();
+        }
+        return cnt;
+    }
+
+    public int team3PM(){
+        int cnt = 0;
+        for (int i = 0; i < playerStats.size(); i++){
+            cnt += playerStats.get(i).madeThrees();
+        }
+        return cnt;
+    }
+
+    public int team3PA(){
+        int cnt = 0;
+        for (int i = 0; i < playerStats.size(); i++){
+            cnt += playerStats.get(i).attemptedThrees();
+        }
+        return cnt;
+    }
+
+    public int team4PP(){
+        int cnt = 0;
+        for (int i = 0; i < playerStats.size(); i++){
+            cnt += playerStats.get(i).fourPointPlays();
+        }
+        return cnt;
+    }
+
     public int teamAssists(){
         int cnt = 0;
         for (int i = 0; i < playerStats.size(); i++){
@@ -57,7 +97,7 @@ public class TeamStats {
         String string = "";
         for (int i = 0; i < team.getRoster().noPlayers(); i++){
             
-            string += String.format("%-24s",team.getRoster().getPlayer(i).getName());
+            string += String.format("%-28s",team.getRoster().getPlayer(i).getName() +  " (" + (int) team.getRoster().getPlayer(i).overall() + ")");
             string += " ";
             string += String.format("%-12s",  " Minutes: " + team.getRosterMinutes()[i]);
             if (team.getRosterMinutes()[i] == 0){
@@ -73,7 +113,17 @@ public class TeamStats {
         string += teamAssists();
         string += " team Assists | ";
         string += teamRebouds();
-        string += " team Rebounds\n";
+        string += " team Rebounds | ";
+        string += teamFGM();
+        string += "/";
+        string += teamFGA();
+        string += " FGA | ";
+        string += team3PM();
+        string += "/";
+        string += team3PA();
+        string += " 3pts | ";
+        string += team4PP();
+        string += " 4-point plays\n";
         return string;
     }
 

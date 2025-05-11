@@ -41,7 +41,19 @@ public class ShotAttempt {
     private Team defendingTeam;
     private CourtLocations courtLocation;
     private boolean make;
+    private boolean fouled;
 
+    public boolean getFouled(){
+        return fouled;
+    }
+
+    public void setFouled(boolean fouled){
+        this.fouled = fouled;
+    }
+
+    public Team getDefendingTeam(){
+        return defendingTeam;
+    }
 
     public CourtLocations getCourtLocation(){
         return courtLocation;

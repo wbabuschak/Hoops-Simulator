@@ -3,7 +3,7 @@ public class Roster {
     public static boolean forceRosterLimit = false;
     public static double skillReliance = 2.0;
     public static final int MINUTES_RFACTOR = 5;
-    public static final double ASSIST_RATE = 0.5;
+    public static final double ASSIST_RATE = 0.3;
 
     private int[] minutes = {};
     private Player[] players;
@@ -17,6 +17,19 @@ public class Roster {
         }
         //System.out.println("found " + cnt + " players");
         return cnt;
+    }
+
+    public void sort(){
+        
+        for (int i = 0; i < ROSTER_SIZE - 1; i++){
+            for (int j = i + 1; j < ROSTER_SIZE; j++){
+                if (players[j].overall() > players[i].overall()){
+                    Player temp = players[i];
+                    players[i] = players[j];
+                    players[j] = temp;
+                }
+            }
+        }
     }
 
     /**
@@ -224,7 +237,7 @@ public class Roster {
             if (minutes[i] == 0){
                 continue;
             }
-            total += Math.pow(minutes[i], 2);
+            total += Math.pow(minutes[i], 3);
             total += skillReliance * players[i].getAttributeValue("3pt");
             total += skillReliance * players[i].getAttributeValue("Midrange");
             total += skillReliance * players[i].getAttributeValue("Rim Finishing");
@@ -238,7 +251,7 @@ public class Roster {
             if (minutes[i] == 0){
                 continue;
             }
-            cumulative += Math.pow(minutes[i], 2);
+            cumulative += Math.pow(minutes[i], 3);
             cumulative += skillReliance * players[i].getAttributeValue("3pt");
             cumulative += skillReliance * players[i].getAttributeValue("Midrange");
             cumulative += skillReliance * players[i].getAttributeValue("Rim Finishing");
@@ -257,7 +270,7 @@ public class Roster {
             if (getMinutes()[i] == 0){
                 continue;
             }
-            total += Math.pow(getMinutes()[i], 2) * getPlayer(i).getAttributeValue("Offensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
+            total += Math.pow(getMinutes()[i], 3) * getPlayer(i).getAttributeValue("Offensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
         }
         double r = Math.random() * total;
         double cumulative = 0.0;
@@ -266,7 +279,7 @@ public class Roster {
             if (getMinutes()[i] == 0){
                 continue;
             }
-            cumulative += Math.pow(getMinutes()[i], 2) * getPlayer(i).getAttributeValue("Offensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
+            cumulative += Math.pow(getMinutes()[i], 3) * getPlayer(i).getAttributeValue("Offensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
             if (r <= cumulative) {
                 return getPlayer(i);
             }
@@ -282,7 +295,7 @@ public class Roster {
                 continue;
             }
             //System.out.println("total: " + total);
-            total += Math.pow(getMinutes()[i], 2) * getPlayer(i).getAttributeValue("Defensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
+            total += Math.pow(getMinutes()[i], 3) * getPlayer(i).getAttributeValue("Defensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
         }
         double r = Math.random() * total;
         double cumulative = 0.0;
@@ -293,7 +306,7 @@ public class Roster {
                 continue;
             }
             //System.out.println("cumulative: " + cumulative);
-            cumulative += Math.pow(getMinutes()[i], 2) * getPlayer(i).getAttributeValue("Defensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
+            cumulative += Math.pow(getMinutes()[i], 3) * getPlayer(i).getAttributeValue("Defensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
             if (r <= cumulative) {
                 return getPlayer(i);
             }
@@ -308,7 +321,7 @@ public class Roster {
             if (getMinutes()[i] == 0){
                 continue;
             }
-            total += Math.pow(getMinutes()[i], 2) * getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE;
+            total += Math.pow(getMinutes()[i], 3) * getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE;
         }
         double r = Math.random() * total;
         double cumulative = 0.0;
@@ -317,11 +330,60 @@ public class Roster {
             if (getMinutes()[i] == 0){
                 continue;
             }
-            cumulative += Math.pow(getMinutes()[i], 2) * getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE;
+            cumulative += Math.pow(getMinutes()[i], 3) * getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE;
             if (r <= cumulative) {
                 if (((getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_MAX) * ASSIST_RATE > Math.random())){
                     return getPlayer(i);
                 }
+            }
+        }
+        // returns null if no player is credited with assist
+        return null;
+    }
+
+
+    public Player getDefender(CourtLocations courtLocation){
+        double total = 0.0;
+        String defenderAttribute;
+        switch(courtLocation){
+            case CourtLocations.PAINT:
+                defenderAttribute = "Paint D";
+                break;
+            case CourtLocations.MIDRANGE:
+                defenderAttribute = "combined_defense";
+                break;
+            case CourtLocations.THREE:
+                defenderAttribute = "Perimeter D";
+                break;
+            // should never occur
+            default:
+                return null;
+        }
+        for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
+            if (getMinutes()[i] == 0){
+                continue;
+            }
+            if (defenderAttribute.equals("combined_defense")){
+                total += Math.pow(getMinutes()[i], 3) * (getPlayer(i).getAttributeValue("Paint D") + getPlayer(i).getAttributeValue("Perimeter D"))/ (2 * Attribute.ATTRIBUTE_AVERAGE);
+            } else {
+                total += Math.pow(getMinutes()[i], 3) * getPlayer(i).getAttributeValue(defenderAttribute)/Attribute.ATTRIBUTE_AVERAGE;
+            }
+            
+        }
+        double r = Math.random() * total;
+        double cumulative = 0.0;
+
+        for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
+            if (getMinutes()[i] == 0){
+                continue;
+            }
+            if (defenderAttribute.equals("combined_defense")){
+                cumulative += Math.pow(getMinutes()[i], 3) * (getPlayer(i).getAttributeValue("Paint D") + getPlayer(i).getAttributeValue("Perimeter D"))/ (2 * Attribute.ATTRIBUTE_AVERAGE);
+            } else {
+                cumulative += Math.pow(getMinutes()[i], 3) * getPlayer(i).getAttributeValue(defenderAttribute)/Attribute.ATTRIBUTE_AVERAGE;
+            }
+            if (r <= cumulative) {
+                return getPlayer(i);
             }
         }
         // returns null if no player is credited with assist

@@ -19,6 +19,26 @@ public class PlayerStats {
         return cnt;
     }
 
+    public int fourPointPlays(){
+        int cnt = 0;
+        for (int i = 0; i < shotAttempts.size(); i++){
+            if (shotAttempts.get(i).make() == 3 && shotAttempts.get(i).getFouled() == true){
+                cnt++;
+            }
+        }
+        return cnt;
+    }
+
+    public int attemptedThrees(){
+        int cnt = 0;
+        for (int i = 0; i < shotAttempts.size(); i++){
+            if (shotAttempts.get(i).getCourtLocation() == CourtLocations.THREE){
+                cnt++;
+            }
+        }
+        return cnt;
+    }
+
     public int fieldGoalsAttempted(){
         int cnt = 0;
         for (int i = 0; i < shotAttempts.size(); i++){
@@ -29,13 +49,32 @@ public class PlayerStats {
 
     public int fieldGoalsMade(){
         int cnt = 0;
-        for (int i = 0; i < fieldGoalsAttempted(); i++){
-            if (shotAttempts.get(i).make() > 0){
+        for (int i = 0; i < shotAttempts.size(); i++){
+            if (shotAttempts.get(i).make() > 1){
                 cnt++;
             }
         }
         return cnt;
     }
+
+    public int freeThrowsAttempted(){
+        int cnt = 0;
+        for (int i = 0; i < shotAttempts.size(); i++){
+            if (shotAttempts.get(i).getCourtLocation() == CourtLocations.FT) cnt++;
+        }
+        return cnt;
+    }
+
+    public int freeThrowsMade(){
+        int cnt = 0;
+        for (int i = 0; i < shotAttempts.size(); i++){
+            if (shotAttempts.get(i).make() == 1){
+                cnt++;
+            }
+        }
+        return cnt;
+    }
+    
 
     public PlayerStats(Player player){ 
         this.player = player;
@@ -111,13 +150,22 @@ public class PlayerStats {
         slashline += getAssists();
         int threes = madeThrees();
         string += String.format("%-9s", slashline);
-        if (fieldGoalsAttempted() > 0){
-            String fg = "| ";
+        if (fieldGoalsAttempted() > 0 || freeThrowsAttempted() > 0){
+            String fg = " | ";
             fg += fieldGoalsMade();
             fg += "/";
             fg += fieldGoalsAttempted();
             fg += " FG";
             string += fg;
+        }
+
+        if (freeThrowsAttempted() > 0){
+            String ft = ", ";
+            ft += freeThrowsMade();
+            ft += "/";
+            ft += freeThrowsAttempted();
+            ft += " FT";
+            string += ft;
         }
         
         if (madeThrees() > 0){
