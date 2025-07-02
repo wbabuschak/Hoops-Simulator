@@ -99,9 +99,9 @@ public class GUI {
         backFrame.pack();
         backFrame.setLocationRelativeTo(null);
 
-        // ImageIcon icon = new ImageIcon(getClass().getClassLoader().getResource("thumbnail.png"));
-        // Image image = icon.getImage();
-        // backFrame.setIconImage(image);
+        ImageIcon icon = new ImageIcon(getClass().getClassLoader().getResource("ctrl/HoopsSimulator.png"));
+        Image image = icon.getImage();
+        backFrame.setIconImage(image);
 
         
         backFrame.setVisible(true);
