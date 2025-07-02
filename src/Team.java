@@ -11,7 +11,7 @@ public class Team {
     private static ArrayList<String> teamNames;
 
     public String toString(){
-        return location + " " + name + "\n" + roster.toString();
+        return name;
     }
 
     public double getRosterAttributeMean(String attributeName){

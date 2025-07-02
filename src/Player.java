@@ -120,24 +120,17 @@ public class Player {
         return attributes;
     }
 
-    public double overall(){
+    public int overall(){
         double sum = 0;
         for (int i = 0; i < attributes.size(); i++){
             sum += attributes.get(i).getValue();
         }
-        return sum / (double) attributes.size();
+        return (int) (sum / (double) attributes.size());
     }
 
     public String toString(){
-        String string = name;
-        string += " ";
-        for (int i = 0; i < getAttributes().size(); i++){
-            // string += getAttributes().get(i).getName();
-            // string += " ";
-            string += (int) getAttributes().get(i).getValue();
-            string += " ";
-        }
-        return string;
+        
+        return name + " (" + overall() + ")";
     }
 
     public static String randomName(){

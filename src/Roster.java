@@ -6,7 +6,7 @@ public class Roster {
     public static final double ASSIST_RATE = 0.3;
 
     private int[] minutes = {};
-    private Player[] players;
+    public Player[] players;
 
     public int noPlayers(){
         int cnt = 0;
@@ -388,5 +388,14 @@ public class Roster {
         }
         // returns null if no player is credited with assist
         return null;
+    }
+
+
+    public String toString(){
+        String fullString = "";
+        for (int i = 0; i < ROSTER_SIZE; i++){
+            fullString += players[i].toString();
+        }
+        return fullString;
     }
 }
