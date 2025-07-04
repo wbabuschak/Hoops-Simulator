@@ -31,10 +31,20 @@ public class Team {
     public static Team randomTeam(){
         Team team = new Team();
         team.setName(randomName());
-        for (int i = 0; i < Roster.ROSTER_SIZE; i++){
-            team.getRoster().addPlayer(i, Player.randomPlayer());
+        team.getRoster().addPlayer(0, Player.randomPlayer(Role.PG));
+        team.getRoster().addPlayer(1, Player.randomPlayer(Role.SG));
+        team.getRoster().addPlayer(2, Player.randomPlayer(Role.SF));
+        team.getRoster().addPlayer(3, Player.randomPlayer(Role.PF));
+        team.getRoster().addPlayer(4, Player.randomPlayer(Role.C));
+        team.getRoster().addPlayer(5, Player.randomPlayer(Role.PG));
+        team.getRoster().addPlayer(6, Player.randomPlayer(Role.SG));
+        team.getRoster().addPlayer(7, Player.randomPlayer(Role.SF));
+        team.getRoster().addPlayer(8, Player.randomPlayer(Role.PF));
+        team.getRoster().addPlayer(9, Player.randomPlayer(Role.C));
+        for (int i = 10; i < Roster.ROSTER_SIZE; i++){
+            team.getRoster().addPlayer(i, Player.randomPlayer(Role.ATH));
         }
-        team.getRoster().sort();
+        team.getRoster().teamSort();
         return team;
     }
 

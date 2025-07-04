@@ -1,4 +1,9 @@
+import java.util.ArrayList;
+
 public class GameManager {
-    public static final int SEASON_GAMES = 82;
-    Game[] games = new Game[SEASON_GAMES];
+    public ArrayList<Game> games = new ArrayList<Game>();
+    
+    public void addGame(Game game){
+        games.add(game);
+    }
 }

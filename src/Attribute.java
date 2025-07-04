@@ -34,4 +34,9 @@ public class Attribute {
     public String getName(){
         return name;
     }
+
+    public String toString(){
+        return (int) value + "- " + name;
+    }
+    
 }

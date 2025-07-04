@@ -3,7 +3,7 @@ public class Roster {
     public static boolean forceRosterLimit = false;
     public static double skillReliance = 2.0;
     public static final int MINUTES_RFACTOR = 5;
-    public static final double ASSIST_RATE = 0.3;
+    public static final double ASSIST_RATE = 0.2;
 
     private int[] minutes = {};
     public Player[] players;
@@ -19,9 +19,17 @@ public class Roster {
         return cnt;
     }
 
-    public void sort(){
-        
-        for (int i = 0; i < ROSTER_SIZE - 1; i++){
+    public void teamSort(){
+        for (int i = 0; i < 5; i++){
+            for (int j = i + 1; j < ROSTER_SIZE; j++){
+                if (players[j].overall() > players[i].overall() && players[j].role == players[i].role){
+                    Player temp = players[i];
+                    players[i] = players[j];
+                    players[j] = temp;
+                }
+            }
+        }
+        for (int i = 5; i < ROSTER_SIZE - 1; i++){
             for (int j = i + 1; j < ROSTER_SIZE; j++){
                 if (players[j].overall() > players[i].overall()){
                     Player temp = players[i];

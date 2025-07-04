@@ -261,7 +261,8 @@ public class Game {
     public Player getPOTG(){
         Player player = null;
         double max = 0;
-        if (getWinner() == team1){
+        // System.out.println("~~~~~~~~~~~~~~~~~~~");
+        if (getWinner().equals(team1)){
             for (int i = 0; i < team1.getRoster().noPlayers(); i++){
                 double t = teamstats1.getPlayerStats().get(i).calculateBPER();
                 // System.out.println("\t DEBUG: " + team1.getRoster().getPlayer(i).getName() + " " + t + " points.");
@@ -270,10 +271,10 @@ public class Game {
                     max = t;
                 }
             }
-        } else if (getWinner() == team2){
+        } else if (getWinner().equals(team2)){
             for (int i = 0; i < team2.getRoster().noPlayers(); i++){
-                double t = teamstats1.getPlayerStats().get(i).calculateBPER();
-                // System.out.println("\t DEBUG: " + team1.getRoster().getPlayer(i).getName() + " " + t + " points.");
+                double t = teamstats2.getPlayerStats().get(i).calculateBPER();
+                // System.out.println("\t DEBUG: " + team2.getRoster().getPlayer(i).getName() + " " + t + " points.");
                 if (t > max){
                     player = team2.getRoster().getPlayer(i);
                     max = t;
@@ -284,96 +285,47 @@ public class Game {
     }
 
     public String toString(){
-        String string;
-        if (teamstats1.getScore() == teamstats2.getScore()){
-            string = "Game has not been played!";
-        } else if (getWinner().equals(team1)){
-             string = team1.getName();
-            string += " won ";
-            string += teamstats1.getScore(); 
-            string += "-";
-            string += teamstats2.getScore();
-            string += "\n\t Player of the game: ";
-            string += getPOTG().getName();
-            string += " ";
-            string += teamstats1.getStatsFromPlayer(getPOTG()).toString();
-        } else {
-            string = team2.getName();
-            string += " won ";
-            string += teamstats2.getScore(); 
-            string += "-";
-            string += teamstats1.getScore();
-            string += "\n\t Player of the game: ";
-            string += getPOTG().getName();
-            string += " ";
-            string += teamstats2.getStatsFromPlayer(getPOTG()).toString();
-        }
-        
-        
-        return string;
+        return team1.getName() + " vs " + team2.getName() + ": " + teamstats1.getScore() + "-" + teamstats2.getScore();
     }
 
-    public String toString(boolean full){
-        String string;
-        if (!full){
-            if (teamstats1.getScore() == teamstats2.getScore()){
-                string = "Game has not been played!";
-            } else if (getWinner().equals(team1)){
-                string = team1.getName();
-                string += " won ";
-                string += teamstats1.getScore(); 
-                string += "-";
-                string += teamstats2.getScore();
-            } else {
-                string = team2.getName();
-                string += " won ";
-                string += teamstats2.getScore(); 
-                string += "-";
-                string += teamstats1.getScore();
-            }
+    public String toString(boolean full) {
+        StringBuilder sb = new StringBuilder();
+
+        if (teamstats1.getScore() == teamstats2.getScore()) {
+            sb.append("Game has not been played!");
         } else {
-            if (teamstats1.getScore() == teamstats2.getScore()){
-                string = "Game has not been played!";
-            } else if (getWinner().equals(team1)){
-                string = team1.getName();
-                string += " won ";
-                string += teamstats1.getScore(); 
-                string += "-";
-                string += teamstats2.getScore();
-                string += "\n\n";
-                string += "Player of the game: ";
-                string += getPOTG().getName();
-                string += "\n\n";
-                string += team1.getName();
-                string += "\n\n";
-                string += teamstats1.toString();
-                string += "\n";
-                string += team2.getName();
-                string += "\n\n";
-                string += teamstats2.toString();
+            Team winner, loser;
+            TeamStats winnerStats, loserStats;
+
+            if (getWinner().equals(team1)) {
+                winner = team1;
+                loser = team2;
+                winnerStats = teamstats1;
+                loserStats = teamstats2;
             } else {
-                string = team2.getName();
-                string += " won ";
-                string += teamstats2.getScore(); 
-                string += "-";
-                string += teamstats1.getScore();
-                string += "\n\n";
-                string += "Player of the game: ";
-                string += getPOTG().getName();
-                string += "\n\n";
-                string += team2.getName();
-                string += "\n\n";
-                string += teamstats2.toString();
-                string += "\n";
-                string += team1.getName();
-                string += "\n\n";
-                string += teamstats1.toString();
+                winner = team2;
+                loser = team1;
+                winnerStats = teamstats2;
+                loserStats = teamstats1;
             }
-        } 
-        
-        
-        
-        return string;
+
+            sb.append(String.format("%s won %d-%d%n%n",
+                    winner.getName(),
+                    winnerStats.getScore(),
+                    loserStats.getScore()));
+
+            if (full) {
+                sb.append(String.format("Player of the game: %s%n%n", getPOTG().getName()));
+
+                sb.append(winner.getName() + "\n\n");
+                sb.append(winnerStats.toString());
+                sb.append("\n");
+                sb.append(loser.getName() + "\n\n");
+                sb.append(loserStats.toString());
+            }
+        }
+
+        return sb.toString();
     }
 
     

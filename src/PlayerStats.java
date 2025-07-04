@@ -139,50 +139,49 @@ public class PlayerStats {
         return (double) (2 * PTS - 0.5 * FTA - FGA + 0.5 * DREB + 1.5 * OREB + ASS - 2.0 * TO);
     }
     
-    public String toString(){
-        String string = "BPER: ";
-        string += String.format("%-6s", new DecimalFormat("0.00").format(calculateBPER()));
-        string += " | ";
-        String slashline = String.valueOf(getPoints());
-        slashline += "/";
-        slashline += getRebounds();
-        slashline += "/";
-        slashline += getAssists();
-        int threes = madeThrees();
-        string += String.format("%-9s", slashline);
-        if (fieldGoalsAttempted() > 0 || freeThrowsAttempted() > 0){
-            String fg = " | ";
-            fg += fieldGoalsMade();
-            fg += "/";
-            fg += fieldGoalsAttempted();
-            fg += " FG";
-            string += fg;
-        }
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
 
-        if (freeThrowsAttempted() > 0){
-            String ft = ", ";
-            ft += freeThrowsMade();
-            ft += "/";
-            ft += freeThrowsAttempted();
-            ft += " FT";
-            string += ft;
-        }
-        
-        if (madeThrees() > 0){
-            string += ", ";
-            string += threes;
-            string += " 3pt";
-        }
+        // BPER block
+        double bper = calculateBPER();
+        sb.append(String.format("BPER: %5.2f", bper));
+        sb.append(" | ");
 
-        if (getORebounds() > 0){
-            string += ", ";
-            string += getORebounds();
-            string += " OREB";
-        }
-        
+        // slash line: PTS/REB/AST
+        String slashLine = String.format("%-8s", getPoints() + "/" + getRebounds() + "/" + getAssists());
+        sb.append(slashLine);
+        sb.append(" | ");
 
-        return string;
+        // FG string
+        String fgString = (fieldGoalsAttempted() > 0)
+                ? String.format("%-10s", fieldGoalsMade() + "/" + fieldGoalsAttempted() + " FG")
+                : String.format("%-10s", "");
+        sb.append(fgString);
+        sb.append(" | ");
+
+        // FT string
+        String ftString = (freeThrowsAttempted() > 0)
+                ? String.format("%-8s", freeThrowsMade() + "/" + freeThrowsAttempted() + " FT")
+                : String.format("%-8s", "");
+        sb.append(ftString);
+        sb.append(" | ");
+
+        // 3pt string
+        String threePtString = (madeThrees() > 0)
+                ? String.format("%-8s", madeThrees() + " 3pt")
+                : String.format("%-8s", "");
+        sb.append(threePtString);
+        sb.append(" | ");
+
+        // OREB string
+        String orebString = (getORebounds() > 0)
+                ? String.format("%-8s", getORebounds() + " OREB")
+                : String.format("%-8s", "");
+        sb.append(orebString);
+
+        return sb.toString().trim();
     }
+
 
     public void addShotAttempt(ShotAttempt shotAttempt){
         shotAttempts.add(shotAttempt);
