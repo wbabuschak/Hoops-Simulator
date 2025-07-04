@@ -18,7 +18,6 @@ You can email me if you have questions about the future of this project
 
 ## More to come
 There are many more features coming for this program including
-- Game log
 - Season simulator
 - Player awards
 - Team Customizer
