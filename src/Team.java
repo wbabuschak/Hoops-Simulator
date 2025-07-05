@@ -6,6 +6,7 @@ public class Team {
     String location;
     String name;
     Roster roster;
+    int wins;
 
     private static ArrayList<String> cities;
     private static ArrayList<String> teamNames;

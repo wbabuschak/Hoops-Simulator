@@ -2,7 +2,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class PlayerStats {
-    private Player player;
+    public Player player;
     ArrayList<ShotAttempt> shotAttempts;
     private int assists;
     private int turnovers;
@@ -136,7 +136,7 @@ public class PlayerStats {
         int ASS = getAssists();
         int TO = getTurnovers();
 
-        return (double) (2 * PTS - 0.5 * FTA - FGA + 0.5 * DREB + 1.5 * OREB + ASS - 2.0 * TO);
+        return (double) (2 * PTS - 0.5 * FTA - FGA + 0.5 * DREB + 1.0 * OREB + 2.0 * ASS - 3.0 * TO);
     }
     
     public String toString() {

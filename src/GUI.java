@@ -42,6 +42,9 @@ public class GUI {
 
     private JLabel matchupRecord;
 
+    private JButton btnPlayAll;
+    private JTextArea taBest;
+
     public GUI(){
         gameManager = new GameManager();
         backFrame = new JFrame();
@@ -53,7 +56,7 @@ public class GUI {
         taMatchup.setEditable(false);
         taMatchup.setFont(new Font("Monospaced",Font.PLAIN,12));
         gameScrollPane = new JScrollPane(taMatchup);
-        gameScrollPane.setPreferredSize(new Dimension(960, 360));
+        gameScrollPane.setPreferredSize(new Dimension(960, 240));
 
         btnSetTeam1 = new JButton("Set Home Team");
         btnSetTeam1.addActionListener(e -> {
@@ -90,7 +93,25 @@ public class GUI {
         teamList = new JList<>(teams);
         teamScrollPane = new JScrollPane(teamList);
         teamScrollPane.setPreferredSize(new Dimension(200, 240));
-        
+        teamList.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(
+                    JList<?> list,
+                    Object value,
+                    int index,
+                    boolean isSelected,
+                    boolean cellHasFocus) {
+                
+                JLabel label = (JLabel) super.getListCellRendererComponent(
+                        list, value, index, isSelected, cellHasFocus);
+                
+                Team team = (Team) value;
+                label.setText(team.getName() + " (" + team.wins + ")");
+                
+                return label;
+            }
+        });
+                
         gameList = new JList<>(gameManager.games.toArray(new Game[0]));
         gameLog = new JScrollPane(gameList);
         gameLog.setPreferredSize(new Dimension(320, 240));
@@ -122,6 +143,44 @@ public class GUI {
 
         JLabel iconImage = new JLabel(icon);
 
+        btnPlayAll = new JButton("Play round robin");
+        btnPlayAll.addActionListener(e -> {
+            gameManager.playAll(teams);
+            updateGameLog();
+            teamList.setListData(teams);
+            updateMatchupLabel();
+        });
+        
+        taBest = new JTextArea();
+        taBest.setEditable(false);
+        taBest.setLineWrap(true);
+        taBest.setWrapStyleWord(true);
+        taBest.setPreferredSize(new Dimension(200, 100));
+        JButton btnMVP = new JButton("Find MVP");
+        
+        btnMVP.addActionListener(
+            e -> {
+                Player MVP = gameManager.findMVP();
+                if (MVP == null){
+                    taBest.setText("");
+                    return;
+                }
+                int gamesPlayed = MVP.gamesPlayed;
+                taBest.setText(MVP.toString() + " " + (int) (MVP.points / gamesPlayed) + "/" + (int) (MVP.rebounds / gamesPlayed) + "/" + (int) (MVP.assists / gamesPlayed));
+            });
+
+        JButton btnPerf = new JButton("Find Best Performance");
+        btnPerf.addActionListener(
+            e -> {
+                PlayerStats best = gameManager.findBestPerformance();
+                if (best == null){
+                    taBest.setText("");
+                    return;
+                }
+                Player bestPlayer = best.player;
+                taBest.setText(bestPlayer.toString() + " " + (best));
+            });
+
         addElement(iconImage, 0, 0);
         addElement(btnSimulate,0,1);
         addElement(teamScrollPane,1,0);
@@ -133,6 +192,10 @@ public class GUI {
         addElement(playerArchetype, 3, 1);
         addElement(gameLog, 0, 5);
         addElement(matchupRecord, 0, 2);
+        addElement(btnPlayAll, 1, 3);
+        addElement(btnMVP, 2, 2);
+        addElement(taBest, 2, 3);
+        addElement(btnPerf, 2, 1);
 
         backFrame.add(mainPanel, BorderLayout.CENTER);
         backFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -195,7 +258,8 @@ public class GUI {
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 Player player = (Player) value;
                 if (!isSelected) {
-                    label.setBackground(new Color((int) (255 - (128 * player.overall()/Attribute.ATTRIBUTE_MAX)), (int) (128 + (128 * player.overall()/Attribute.ATTRIBUTE_MAX)),0));
+                    label.setBackground(new Color((int) (255 - (128 * player.overall()/Attribute.ATTRIBUTE_MAX)), (int) (128 + (127 * player.overall()/Attribute.ATTRIBUTE_MAX)),0));
+                    //System.out.println((int) (255 - (128 * player.overall()/Attribute.ATTRIBUTE_MAX)) + ", " + (int) (128 + (127 * player.overall()/Attribute.ATTRIBUTE_MAX)));
                     label.setOpaque(true);
                 }
 
@@ -218,7 +282,8 @@ public class GUI {
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 Attribute att = (Attribute) value;
                 if (!isSelected) {
-                    label.setBackground(new Color((int) (255 - (128 * att.getValue()/Attribute.ATTRIBUTE_MAX)), (int) (128 + (128 * att.getValue()/Attribute.ATTRIBUTE_MAX)),0));
+                    label.setBackground(new Color((int) (255 - (128 * att.getValue()/Attribute.ATTRIBUTE_MAX)), (int) (128 + (127 * att.getValue()/Attribute.ATTRIBUTE_MAX)),0));
+                    //System.out.println((int) (255 - (128 * att.getValue()/Attribute.ATTRIBUTE_MAX)) + ", " + (int) (128 + (127 * att.getValue()/Attribute.ATTRIBUTE_MAX)));
                     label.setOpaque(true);
                 }
 

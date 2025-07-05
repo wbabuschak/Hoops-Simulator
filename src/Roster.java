@@ -1,9 +1,14 @@
 public class Roster {
     public static final int ROSTER_SIZE = 12;
     public static boolean forceRosterLimit = false;
-    public static double skillReliance = 2.0;
+    public static double skillReliance = 3.0;
     public static final int MINUTES_RFACTOR = 5;
-    public static final double ASSIST_RATE = 0.2;
+    public static final double ASSIST_RATE = 0.4;
+    public static final int ASSIST_MINUTES_FACTOR = 5;
+    public static final double ASSIST_SKILL_FACTOR = 3.0;
+    public static final int REBOUND_MINUTES_FACTOR = 5;
+    public static final double REBOUND_SKILL_FACTOR = 3.0;
+    public static final int SHOOTING_MINUTES_FACTOR = 5;
 
     private int[] minutes = {};
     public Player[] players;
@@ -278,7 +283,7 @@ public class Roster {
             if (getMinutes()[i] == 0){
                 continue;
             }
-            total += Math.pow(getMinutes()[i], 3) * getPlayer(i).getAttributeValue("Offensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
+            total += Math.pow(getMinutes()[i], REBOUND_MINUTES_FACTOR) * REBOUND_SKILL_FACTOR * getPlayer(i).getAttributeValue("Offensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
         }
         double r = Math.random() * total;
         double cumulative = 0.0;
@@ -287,7 +292,7 @@ public class Roster {
             if (getMinutes()[i] == 0){
                 continue;
             }
-            cumulative += Math.pow(getMinutes()[i], 3) * getPlayer(i).getAttributeValue("Offensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
+            cumulative += Math.pow(getMinutes()[i], REBOUND_MINUTES_FACTOR) * REBOUND_SKILL_FACTOR * getPlayer(i).getAttributeValue("Offensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
             if (r <= cumulative) {
                 return getPlayer(i);
             }
@@ -296,14 +301,14 @@ public class Roster {
         return null;
     }
 
-        public Player getDefensiveRebounder(){
+    public Player getDefensiveRebounder(){
         double total = 0.0;
         for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
             if (getMinutes()[i] == 0){
                 continue;
             }
             //System.out.println("total: " + total);
-            total += Math.pow(getMinutes()[i], 3) * getPlayer(i).getAttributeValue("Defensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
+            total += Math.pow(getMinutes()[i], REBOUND_MINUTES_FACTOR) * REBOUND_SKILL_FACTOR * getPlayer(i).getAttributeValue("Defensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
         }
         double r = Math.random() * total;
         double cumulative = 0.0;
@@ -314,7 +319,7 @@ public class Roster {
                 continue;
             }
             //System.out.println("cumulative: " + cumulative);
-            cumulative += Math.pow(getMinutes()[i], 3) * getPlayer(i).getAttributeValue("Defensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
+            cumulative += Math.pow(getMinutes()[i], REBOUND_MINUTES_FACTOR) * REBOUND_SKILL_FACTOR * getPlayer(i).getAttributeValue("Defensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE;
             if (r <= cumulative) {
                 return getPlayer(i);
             }
@@ -329,7 +334,7 @@ public class Roster {
             if (getMinutes()[i] == 0){
                 continue;
             }
-            total += Math.pow(getMinutes()[i], 3) * getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE;
+            total += Math.pow(getMinutes()[i], ASSIST_MINUTES_FACTOR) * ASSIST_SKILL_FACTOR * getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE;
         }
         double r = Math.random() * total;
         double cumulative = 0.0;
@@ -338,7 +343,7 @@ public class Roster {
             if (getMinutes()[i] == 0){
                 continue;
             }
-            cumulative += Math.pow(getMinutes()[i], 3) * getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE;
+            cumulative += Math.pow(getMinutes()[i], ASSIST_MINUTES_FACTOR) * ASSIST_SKILL_FACTOR * getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE;
             if (r <= cumulative) {
                 if (((getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_MAX) * ASSIST_RATE > Math.random())){
                     return getPlayer(i);

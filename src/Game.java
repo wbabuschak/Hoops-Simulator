@@ -6,10 +6,11 @@ public class Game {
     public static final double PACE_SCALAR = 1.0;
     public static final double TURNOVER_SCALAR = 0.15;
     public static final double TURNOVER_RATE = 0.01;
+    public static final double REBOUND_CHANCE = 0.7;
     /**
      * A higher foul difficulty means a defender is less likely to foul
      */
-    public static final double FOUL_DIFFICULTY = 20;
+    public static final double FOUL_DIFFICULTY = 15;
 
     /**
      * A higher three foul difficulty means a defender is less likely to foul on a three pointer
@@ -98,6 +99,7 @@ public class Game {
             }
 
         }
+        getWinner().wins++;
     }
 
     private void runPossession(){
@@ -139,7 +141,7 @@ public class Game {
             shootingTeamStats.getPlayerStats().get(shootingTeam.getRoster().getPosition(oRebounder)).incrementORebound();
             return true;
         } else {
-            defendingTeamStats.getPlayerStats().get(defendingTeam.getRoster().getPosition(dRebounder)).incrementDRebound();
+            if (Math.random() < REBOUND_CHANCE) defendingTeamStats.getPlayerStats().get(defendingTeam.getRoster().getPosition(dRebounder)).incrementDRebound();
         }
         return false;
     }
