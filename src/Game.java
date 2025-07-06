@@ -3,7 +3,7 @@ public class Game {
     public static final int SHOT_CLOCK_LENGTH = 24;
     public static final double MIN_PACE = 0.35;
     public static final double MAX_PACE = 0.90;
-    public static final double PACE_SCALAR = 1.0;
+    public static final double PACE_SCALAR = 1.7;
     public static final double TURNOVER_SCALAR = 0.15;
     public static final double TURNOVER_RATE = 0.01;
     public static final double REBOUND_CHANCE = 0.7;
@@ -34,9 +34,9 @@ public class Game {
     }
 
     public int calculatePossessions(){
-        return (int)(GAME_LENGTH * 2 * (60/(SHOT_CLOCK_LENGTH)) * Math.max(MIN_PACE,
+        return (int)(GAME_LENGTH * PACE_SCALAR * (60/(SHOT_CLOCK_LENGTH)) * Math.max(MIN_PACE,
         Math.min(
-        (PACE_SCALAR * (team1.getRosterAttributeMean("Pace") + (team2.getRosterAttributeMean("Pace"))) / (2 * Attribute.ATTRIBUTE_MAX))
+        ((team1.getRosterAttributeMean("Pace") + (team2.getRosterAttributeMean("Pace"))) / (2 * Attribute.ATTRIBUTE_MAX))
         ,MAX_PACE)));
     }
 

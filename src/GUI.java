@@ -92,7 +92,7 @@ public class GUI {
         randomizeTeams();
         teamList = new JList<>(teams);
         teamScrollPane = new JScrollPane(teamList);
-        teamScrollPane.setPreferredSize(new Dimension(200, 240));
+        teamScrollPane.setPreferredSize(new Dimension(240, 240));
         teamList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(
@@ -114,7 +114,7 @@ public class GUI {
                 
         gameList = new JList<>(gameManager.games.toArray(new Game[0]));
         gameLog = new JScrollPane(gameList);
-        gameLog.setPreferredSize(new Dimension(320, 240));
+        gameLog.setPreferredSize(new Dimension(320, 320));
         gameList.addListSelectionListener(e -> {
             taMatchup.setText(gameList.getSelectedValue().toString(true));
             taMatchup.setCaretPosition(0);
@@ -122,12 +122,12 @@ public class GUI {
 
         playerList = new JList<>();
         teamView = new JScrollPane(playerList);
-        teamView.setPreferredSize(new Dimension(200, 240));
+        teamView.setPreferredSize(new Dimension(240, 240));
         teamList.addListSelectionListener(e -> updateTeamView());
 
         attributeList = new JList<>();
         playerView = new JScrollPane(attributeList);
-        playerView.setPreferredSize(new Dimension(200, 240));
+        playerView.setPreferredSize(new Dimension(240, 240));
         playerList.addListSelectionListener(e -> updatePlayerView());
         playerList.addListSelectionListener(e -> updatePlayerArchetype());
 
