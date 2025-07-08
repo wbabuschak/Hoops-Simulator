@@ -7,6 +7,7 @@ public class Team {
     String name;
     Roster roster;
     int wins;
+    int gamesPlayed;
 
     private static ArrayList<String> cities;
     private static ArrayList<String> teamNames;

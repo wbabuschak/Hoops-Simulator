@@ -121,6 +121,25 @@ public class Roster {
         players[pos] = player;
         return true;
     }
+
+
+    /**
+     * Replace a player on the roster
+     * @param pos
+     * @param player
+     * @return the player that was replaced
+     */
+    public Player replacePlayer(int pos, Player player){
+        if (player == null){
+            return null;
+        }
+        if (pos >= players.length){
+            return null;
+        }
+        Player replaced = players[pos];
+        players[pos] = player;
+        return replaced;
+    }
     /**
      * @depricated
      */

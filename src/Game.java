@@ -100,6 +100,8 @@ public class Game {
 
         }
         getWinner().wins++;
+        team1.gamesPlayed++;
+        team2.gamesPlayed++;
     }
 
     private void runPossession(){

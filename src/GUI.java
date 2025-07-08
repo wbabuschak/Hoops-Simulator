@@ -6,7 +6,8 @@ import java.util.ArrayList;
 
 
 public class GUI {
-    String title = "Hoops Simulator 0.0.3";
+    String title = "Hoops Simulator 0.0.4";
+    public static final int FREE_AGENTS = 1000;
 
     private int noTeams = 16;
 
@@ -45,18 +46,26 @@ public class GUI {
     private JButton btnPlayAll;
     private JTextArea taBest;
 
+    private JScrollPane freeAgentScrollPane;
+    private JList<Player> freeAgentList;
+    Player[] freeAgents;
+
+    private JButton btnAddFreeAgent;
+
+    private JPanel buttonPanel = new JPanel(new GridLayout(4,4,2,2));
+
     public GUI(){
         gameManager = new GameManager();
         backFrame = new JFrame();
         mainPanel = new JPanel();
 
         taMatchup = new JTextArea();
-        taMatchup.setLineWrap(true);
+        //taMatchup.setLineWrap(true);
         taMatchup.setWrapStyleWord(true);
         taMatchup.setEditable(false);
         taMatchup.setFont(new Font("Monospaced",Font.PLAIN,12));
         gameScrollPane = new JScrollPane(taMatchup);
-        gameScrollPane.setPreferredSize(new Dimension(960, 240));
+        gameScrollPane.setPreferredSize(new Dimension(720, 240));
 
         btnSetTeam1 = new JButton("Set Home Team");
         btnSetTeam1.addActionListener(e -> {
@@ -84,7 +93,7 @@ public class GUI {
             }
         });
 
-        btnSimulate = new JButton("Simulate!");
+        btnSimulate = new JButton("Simulate Game");
         btnSimulate.addActionListener(e -> simulateGame());
 
         matchupRecord = new JLabel();
@@ -106,7 +115,7 @@ public class GUI {
                         list, value, index, isSelected, cellHasFocus);
                 
                 Team team = (Team) value;
-                label.setText(team.getName() + " (" + team.wins + ")");
+                label.setText(team.getName() + " (" + team.wins + "-" + (team.gamesPlayed - team.wins) + ")");
                 
                 return label;
             }
@@ -116,7 +125,9 @@ public class GUI {
         gameLog = new JScrollPane(gameList);
         gameLog.setPreferredSize(new Dimension(320, 320));
         gameList.addListSelectionListener(e -> {
-            taMatchup.setText(gameList.getSelectedValue().toString(true));
+            if (!gameList.isSelectionEmpty()){
+                taMatchup.setText(gameList.getSelectedValue().toString(true));
+            }
             taMatchup.setCaretPosition(0);
         });
 
@@ -128,8 +139,35 @@ public class GUI {
         attributeList = new JList<>();
         playerView = new JScrollPane(attributeList);
         playerView.setPreferredSize(new Dimension(240, 240));
-        playerList.addListSelectionListener(e -> updatePlayerView());
-        playerList.addListSelectionListener(e -> updatePlayerArchetype());
+        playerList.addListSelectionListener(e -> {
+            updatePlayerView(0);
+        });
+
+
+        
+        populateFreeAgents();
+
+        freeAgentList = new JList<>(freeAgents);
+        freeAgentScrollPane = new JScrollPane(freeAgentList);
+        freeAgentScrollPane.setPreferredSize(new Dimension(240, 240));
+        freeAgentList.addListSelectionListener(e -> {
+            updatePlayerView(1);
+        });
+
+        freeAgentList.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus){
+                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                Player player = (Player) value;
+                if (!isSelected) {
+                    label.setBackground(new Color((int) (255 - (128 * player.overall()/Attribute.ATTRIBUTE_MAX)), (int) (128 + (127 * player.overall()/Attribute.ATTRIBUTE_MAX)),0));
+                    //System.out.println((int) (255 - (128 * player.overall()/Attribute.ATTRIBUTE_MAX)) + ", " + (int) (128 + (127 * player.overall()/Attribute.ATTRIBUTE_MAX)));
+                    label.setOpaque(true);
+                }
+
+                return label;
+            }
+        });
 
         playerArchetype = new JLabel();
 
@@ -143,7 +181,7 @@ public class GUI {
 
         JLabel iconImage = new JLabel(icon);
 
-        btnPlayAll = new JButton("Play round robin");
+        btnPlayAll = new JButton("Simulate round robin");
         btnPlayAll.addActionListener(e -> {
             gameManager.playAll(teams);
             updateGameLog();
@@ -181,21 +219,32 @@ public class GUI {
                 taBest.setText(bestPlayer.toString() + " " + (best));
             });
 
+        btnAddFreeAgent = new JButton("Add Free Agent");
+        btnAddFreeAgent.addActionListener(e -> addFreeAgent());
+
+        
+        buttonPanel.add(btnSimulate);
+        buttonPanel.add(btnPlayAll);
+        buttonPanel.add(btnPerf);
+        buttonPanel.add(btnMVP);
+        
+        buttonPanel.add(btnSetTeam1);
+        buttonPanel.add(btnSetTeam2);
+        
+        buttonPanel.add(btnAddFreeAgent);
+
         addElement(iconImage, 0, 0);
-        addElement(btnSimulate,0,1);
-        addElement(teamScrollPane,1,0);
-        addElement(teamView, 2, 0);
-        addElement(playerView, 3, 0);
-        addElement(btnSetTeam1, 1, 1);
-        addElement(btnSetTeam2, 1, 2);
-        addElement(gameScrollPane, 0, 4);
-        addElement(playerArchetype, 3, 1);
-        addElement(gameLog, 0, 5);
-        addElement(matchupRecord, 0, 2);
-        addElement(btnPlayAll, 1, 3);
-        addElement(btnMVP, 2, 2);
-        addElement(taBest, 2, 3);
-        addElement(btnPerf, 2, 1);
+        addElement(teamScrollPane,2,0);
+        addElement(teamView, 3, 0);
+        addElement(playerView, 4, 0);
+        addElement(gameScrollPane, 1, 4);
+        addElement(playerArchetype, 4, 1);
+        addElement(gameLog, 1, 5);
+        addElement(matchupRecord, 1, 2);
+        addElement(taBest, 2, 4);
+        addElement(freeAgentScrollPane, 0, 4);
+
+        addElement(buttonPanel, 0, 1);
 
         backFrame.add(mainPanel, BorderLayout.CENTER);
         backFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -268,14 +317,35 @@ public class GUI {
         });
     }
 
-    private void updatePlayerView(){
-        if (playerList.getSelectedValue() == null){
+    /**
+     * 
+     * @param mode 0 == team mode, 1 == free agent mode
+     */
+    private void updatePlayerView(int mode){
+        boolean teamSelected = playerList.getSelectedValue() != null;
+        boolean faSelected = freeAgentList.getSelectedValue() != null;
+        if (!teamSelected && !faSelected){
             attributeList.setListData(new Attribute[0]);
             return;
         }
-        Attribute[] attributes = playerList.getSelectedValue().attributes.toArray(new Attribute[0]);
-        attributeList.setListData(attributes);
+        
+        JList<Player> list;
+        switch (mode){
+            case 0:
+                list = playerList;
+                break;
+            case 1:
+                list = freeAgentList;
+                break;
+            default: return;
+        }
+        if (list.getSelectedValue() == null){
+            return;
+        }
+        Attribute[] attributes = list.getSelectedValue().attributes.toArray(new Attribute[0]);
+        
 
+        attributeList.setListData(attributes);
         attributeList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus){
@@ -290,6 +360,7 @@ public class GUI {
                 return label;
             }
         });
+        updatePlayerArchetype(mode);
     }
 
     private void simulateGame(){
@@ -348,12 +419,47 @@ public class GUI {
         }); 
     }
 
-    private void updatePlayerArchetype(){
-        if (playerList.getSelectedValue() == null){
-            playerArchetype.setText("");
-            return;
+    /**
+     * 
+     * @param mode 0 == team mode, 1 == free agent mode
+     */
+    private void updatePlayerArchetype(int mode){
+        JList<Player> list;
+        switch (mode){
+            case 0:
+                list = playerList;
+                break;
+            case 1:
+                list = freeAgentList;
+                break;
+            default: return;
         }
-        playerArchetype.setText(Archetype.findArchetype(playerList.getSelectedValue()).name());
+
+        playerArchetype.setText(Archetype.findArchetype(list.getSelectedValue()).name());
+    }
+
+    private void populateFreeAgents(){
+        freeAgents = new Player[FREE_AGENTS];
+        for (int i = 0; i < FREE_AGENTS; i++){
+            freeAgents[i] = Player.randomPlayer(Role.ATH, Attribute.ATTRIBUTE_MAX - (Attribute.ATTRIBUTE_MAX * i) / FREE_AGENTS);
+        }
+        
+    }
+
+    private void addFreeAgent(){
+        Team team = teamList.getSelectedValue();
+        Player player = playerList.getSelectedValue();
+        Player freeAgent = freeAgentList.getSelectedValue();
+        if (team == null || player == null || freeAgent == null){
+            System.out.println("DEBUG");
+            return;   
+        }
+        
+        freeAgents[freeAgentList.getSelectedIndex()] = team.getRoster().replacePlayer(team.getRoster().getPosition(player), freeAgent);
+        updateTeamView();
+        freeAgentList.setListData(freeAgents);
+        playerList.setSelectedValue(freeAgent, true);
+        freeAgentList.setSelectedValue(player, true);
     }
     
 }

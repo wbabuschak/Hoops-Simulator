@@ -114,8 +114,7 @@ public class Player {
         attributes.add(new Attribute("Hard Fouls", 0.0));
     }
 
-    public static Player randomPlayer(Role role){
-        double overall =  (1 - Math.pow(1 - Math.random(), OVERALL_SCALAR)) * Attribute.ATTRIBUTE_MAX;
+    public static Player randomPlayer(Role role, double overall){
         Player player = new Player(role);
         player.name = randomName();
         player.height = -1;
@@ -177,11 +176,18 @@ public class Player {
                 }
                 break;
             default:
-                return randomPlayer(Role.values()[new Random().nextInt(Role.values().length)]);
+                return randomPlayer(Role.values()[new Random().nextInt(Role.values().length)], overall);
         }
         
         return player;
     }
+
+    public static Player randomPlayer(Role role){
+        double overall =  (1 - Math.pow(1 - Math.random(), OVERALL_SCALAR)) * Attribute.ATTRIBUTE_MAX;
+        return randomPlayer(role, overall);
+    }
+
+    
 
     public String getName(){
         return name;
