@@ -451,7 +451,6 @@ public class GUI {
         Player player = playerList.getSelectedValue();
         Player freeAgent = freeAgentList.getSelectedValue();
         if (team == null || player == null || freeAgent == null){
-            System.out.println("DEBUG");
             return;   
         }
         

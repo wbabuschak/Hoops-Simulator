@@ -48,6 +48,9 @@ public class GameManager {
         for (int i = 0; i < games.size(); i++){
             for (int j = 0; j < games.get(i).teamstats1.getPlayerStats().size(); j++){
                 Player playerWithStats = games.get(i).teamstats1.getPlayerStats().get(j).player;
+                if (players.indexOf(playerWithStats) == -1){
+                    continue;
+                }
                 gamesPlayed[players.indexOf(playerWithStats)]++;
                 totalBPER[players.indexOf(playerWithStats)] += games.get(i).teamstats1.getPlayerStats().get(j).calculateBPER();
                 playerWithStats.points += games.get(i).teamstats1.getPlayerStats().get(j).getPoints();
@@ -57,6 +60,9 @@ public class GameManager {
             }
             for (int j = 0; j < games.get(i).teamstats2.getPlayerStats().size(); j++){
                 Player playerWithStats = games.get(i).teamstats2.getPlayerStats().get(j).player;
+                if (players.indexOf(playerWithStats) == -1){
+                    continue;
+                }
                 gamesPlayed[players.indexOf(playerWithStats)]++;
                 totalBPER[players.indexOf(playerWithStats)] += games.get(i).teamstats2.getPlayerStats().get(j).calculateBPER();
                 playerWithStats.points += games.get(i).teamstats2.getPlayerStats().get(j).getPoints();
