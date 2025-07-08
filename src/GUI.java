@@ -96,7 +96,7 @@ public class GUI {
         btnSimulate = new JButton("Simulate Game");
         btnSimulate.addActionListener(e -> simulateGame());
 
-        matchupRecord = new JLabel();
+        matchupRecord = new JLabel(" - ");
 
         randomizeTeams();
         teamList = new JList<>(teams);
