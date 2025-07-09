@@ -20,7 +20,7 @@ public class ShotAttempt {
     /**
      * 
      */
-    public static final double THREE_MAX = 0.75;
+    public static final double THREE_MAX = 0.85;
     /**
      * The worst possible shot attempt from three has a 1% chance of going in
      */

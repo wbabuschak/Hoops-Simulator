@@ -47,7 +47,7 @@ public enum Archetype {
                    player.getAttributeValue("Defensive Discipline");
         }
     },
-    UNMESSWITHABLE {
+    UNSHAKEABLE {
         @Override
         public double score(Player player) {
             return player.getAttributeValue("Contested Rim Finishing") +
@@ -125,6 +125,14 @@ public enum Archetype {
             return player.getAttributeValue("Contested 3pt") +
                    player.getAttributeValue("Offensive Discipline") +
                    player.getAttributeValue("Free Throw");
+        }
+    },
+    WIZARD {
+        @Override
+        public double score(Player player) {
+            return player.getAttributeValue("Dribbling") +
+                   player.getAttributeValue("Offensive Discipline") +
+                   player.getAttributeValue("Rim Finishing");
         }
     },
     THREE_LEVEL_SCORER {

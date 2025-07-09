@@ -1,3 +1,5 @@
+import java.util.Random;
+
 public class Game {
     public static final int GAME_LENGTH = 48;
     public static final int SHOT_CLOCK_LENGTH = 24;
@@ -5,7 +7,7 @@ public class Game {
     public static final double MAX_PACE = 0.90;
     public static final double PACE_SCALAR = 1.7;
     public static final double TURNOVER_SCALAR = 0.15;
-    public static final double TURNOVER_RATE = 0.01;
+    public static final double TURNOVER_RATE = 0.015;
     public static final double REBOUND_CHANCE = 0.7;
     /**
      * A higher foul difficulty means a defender is less likely to foul
@@ -40,46 +42,6 @@ public class Game {
         ,MAX_PACE)));
     }
 
-    public static void gameTest(int trials, double team1Shooting, double team1Defense, double team2Shooting, double team2Defense, boolean extra){
-        if (trials < 1) return;
-        Game game = new Game(Team.randomTeam(), Team.randomTeam());
-        
-        for (int i = 0; i < trials; i++){
-            game = new Game(Team.randomTeam(), Team.randomTeam());
-            if (!(team1Shooting == -1 || team1Defense == -1 ||  team2Shooting == -1|| team2Defense == -1)){
-                for(int j = 0; j < game.team1.getRoster().noPlayers(); j++){
-                    game.team1.getRoster().getPlayer(j).setAttributeValue("Paint D", team1Defense);
-                    game.team1.getRoster().getPlayer(j).setAttributeValue("Perimeter D", team1Defense);
-                    game.team1.getRoster().getPlayer(j).setAttributeValue("3pt", team1Shooting);
-                    game.team1.getRoster().getPlayer(j).setAttributeValue("Rim Finishing", team1Shooting);
-                    game.team1.getRoster().getPlayer(j).setAttributeValue("Midrange", team1Shooting);
-                    
-                }
-                for(int j = 0; j < game.team2.getRoster().noPlayers(); j++){
-                    game.team2.getRoster().getPlayer(j).setAttributeValue("Paint D", team2Defense);
-                    game.team2.getRoster().getPlayer(j).setAttributeValue("Perimeter D", team2Defense);
-                    game.team2.getRoster().getPlayer(j).setAttributeValue("3pt", team2Shooting);
-                    game.team2.getRoster().getPlayer(j).setAttributeValue("Rim Finishing", team2Shooting);
-                    game.team2.getRoster().getPlayer(j).setAttributeValue("Midrange", team2Shooting);
-                    }
-            }
-           
-            game.playGame();
-
-            if (extra){
-                System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                System.out.println(game.toString(true));
-            }
-            
-
-        }
-    }
-
-
-    public static void gameTest(int trials, boolean extra){
-        gameTest(trials, -1, -1, -1, -1, extra);
-    }
-
     public void playGame(){
         possessions = calculatePossessions();
         teamstats1 = new TeamStats(team1);
@@ -87,24 +49,84 @@ public class Game {
         for (int i = 0; i < possessions; i++){
             runPossession();
         }
-        
+        addPlayerMinutes(teamstats1, team1, false);
+        addPlayerMinutes(teamstats2, team2, false);
         // overtime
         while (teamstats1.getScore() == teamstats2.getScore()){
-            possessions = (int)((GAME_LENGTH / 8) * (60/(SHOT_CLOCK_LENGTH/2)) * Math.max(MIN_PACE,
-                Math.min(
-                ((team1.getRosterAttributeMean("Pace") + (team2.getRosterAttributeMean("Pace"))) / (2 * Attribute.ATTRIBUTE_MAX))
-                ,MAX_PACE)));
+            possessions = calculatePossessions() / 8;
+            addPlayerMinutes(teamstats1, team1, true);
+            addPlayerMinutes(teamstats2, team2, true);
             for (int i = 0; i < possessions; i++){
                 runPossession();
             }
-
         }
         getWinner().wins++;
         team1.gamesPlayed++;
         team2.gamesPlayed++;
     }
 
+    private void addPlayerMinutes(TeamStats teamStats, Team team, boolean isOvertime) {
+        Random rng = new Random();
+        Roster roster = team.getRoster();
+        int[] avgMinutesArray = roster.getMinutes();
+        int duration = isOvertime ? (GAME_LENGTH / 8) : GAME_LENGTH;
+
+        double[] prelimMinutes = new double[Roster.ROSTER_SIZE];
+        double totalPrelim = 0.0;
+
+        // Step 1: preliminary random minutes
+        for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
+            int avgMinutes = avgMinutesArray[i];
+            double stdMinutes = avgMinutes * 0.1;
+            double baseMinutes = isOvertime
+                ? avgMinutes * ((double) duration / GAME_LENGTH)
+                : avgMinutes;
+
+            double randomMinutes = baseMinutes + rng.nextGaussian() * (stdMinutes / (isOvertime ? 3.0 : 1.0));
+            randomMinutes = Math.max(0, Math.min(randomMinutes, duration));
+            prelimMinutes[i] = randomMinutes;
+            totalPrelim += randomMinutes;
+        }
+
+        // Step 2: Normalize to total available minutes (duration * 5)
+        double targetTotal = duration * 5;
+        double ratio = targetTotal / totalPrelim;
+
+        int[] finalMinutes = new int[Roster.ROSTER_SIZE];
+        int sumFinal = 0;
+
+        // Step 3: Apply ratio and round
+        for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
+            finalMinutes[i] = (int) Math.round(prelimMinutes[i] * ratio);
+            sumFinal += finalMinutes[i];
+        }
+
+        // Step 4: Adjust for rounding errors
+        int diff = (int) targetTotal - sumFinal;
+        int idx = 0;
+        while (diff != 0) {
+            // Add or subtract 1 minute to players who can take it
+            if (diff > 0) {
+                finalMinutes[idx]++;
+                diff--;
+            } else if (diff < 0 && finalMinutes[idx] > 0) {
+                finalMinutes[idx]--;
+                diff++;
+            }
+            idx = (idx + 1) % Roster.ROSTER_SIZE;
+        }
+
+        // Step 5: Set minutes
+        for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
+            Player player = roster.getPlayer(i);
+            PlayerStats playerStats = teamStats.getStatsFromPlayer(player);
+            playerStats.setMinutes(playerStats.getMinutes() + finalMinutes[i]);
+        }
+}
+
+
     private void runPossession(){
+        
         if (Math.random() > TURNOVER_RATE + TURNOVER_SCALAR * (Attribute.ATTRIBUTE_MAX - team1.getRosterAttributeMean("Offensive Discipline"))/Attribute.ATTRIBUTE_MAX){
             ShotAttempt attempt = takeShot(team1, team2);
             while (!teamstats1.changeScore(attempt) && !attempt.getFouled()) {

@@ -8,6 +8,16 @@ public class PlayerStats {
     private int turnovers;
     private int oRebounds;
     private int dRebounds;
+    
+    public int minutes;
+
+    public int getMinutes() {
+        return minutes;
+    }
+
+    public void setMinutes(int minutes) {
+        this.minutes = minutes;
+    }
 
     public int madeThrees(){
         int cnt = 0;

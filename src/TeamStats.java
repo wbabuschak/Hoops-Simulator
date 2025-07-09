@@ -94,49 +94,49 @@ public class TeamStats {
     }
 
     public String toString() {
-    StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-    // --- HEADER ---
-    sb.append(String.format("%-30s %-12s %-3s %s%n",
-            "Player (OVR)",
-            "Minutes",
-            "|",
-            "Player Stats"));
+        // --- HEADER ---
+        sb.append(String.format("%-30s %-12s %-3s %s%n",
+                "Player (OVR)",
+                "Minutes",
+                "|",
+                "Player Stats"));
 
-    sb.append(String.format("%s%n", "-".repeat(70)));
+        sb.append(String.format("%s%n", "-".repeat(70)));
 
-    // --- PLAYER LINES ---
-    for (int i = 0; i < team.getRoster().noPlayers(); i++) {
-        Player player = team.getRoster().getPlayer(i);
-        String nameOverall = player.getName() + " (" + (int) player.overall() + ")";
+        // --- PLAYER LINES ---
+        for (int i = 0; i < team.getRoster().noPlayers(); i++) {
+            Player player = team.getRoster().getPlayer(i);
+            String nameOverall = player.getName() + " (" + (int) player.overall() + ")";
 
-        sb.append(String.format("%-32s", nameOverall));
-        sb.append(String.format("%-12s", "Minutes: " + team.getRosterMinutes()[i]));
+            sb.append(String.format("%-32s", nameOverall));
+            sb.append(String.format("%-12s", "Minutes: " + playerStats.get(i).getMinutes()));
 
-        if (team.getRosterMinutes()[i] == 0) {
+            if (team.getRosterMinutes()[i] == 0) {
+                sb.append("\n");
+                continue;
+            }
+
+            sb.append(String.format("%-3s", "|"));
+            sb.append(playerStats.get(i).toString());
             sb.append("\n");
-            continue;
         }
 
-        sb.append(String.format("%-3s", "|"));
-        sb.append(playerStats.get(i).toString());
-        sb.append("\n");
+        // --- TEAM TOTALS LINE ---
+        sb.append("-".repeat(70)).append("\n");
+        sb.append(String.format(
+                "%2s team TO | %2s team Assists | %2s team Rebounds | %7s FGA | %2s/%2s 3pts | %1s 4-point plays%n",
+                getTurnovers(),
+                teamAssists(),
+                teamRebouds(),
+                teamFGM() + "/" + teamFGA(),
+                team3PM(), team3PA(),
+                team4PP()
+        ));
+
+        return sb.toString();
     }
-
-    // --- TEAM TOTALS LINE ---
-    sb.append("-".repeat(70)).append("\n");
-    sb.append(String.format(
-            "%2s team TO | %2s team Assists | %2s team Rebounds | %7s FGA | %2s/%2s 3pts | %1s 4-point plays%n",
-            getTurnovers(),
-            teamAssists(),
-            teamRebouds(),
-            teamFGM() + "/" + teamFGA(),
-            team3PM(), team3PA(),
-            team4PP()
-    ));
-
-    return sb.toString();
-}
 
 
     public void turnover(){
