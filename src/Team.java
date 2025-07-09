@@ -27,7 +27,7 @@ public class Team {
 
     public Team(){
         parseNames();
-        roster = new Roster();
+        roster = new Roster(this);
     }
 
     public static Team randomTeam(){

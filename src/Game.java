@@ -5,9 +5,9 @@ public class Game {
     public static final int SHOT_CLOCK_LENGTH = 24;
     public static final double MIN_PACE = 0.35;
     public static final double MAX_PACE = 0.90;
-    public static final double PACE_SCALAR = 1.7;
+    public static final double PACE_SCALAR = 1.6;
     public static final double TURNOVER_SCALAR = 0.15;
-    public static final double TURNOVER_RATE = 0.015;
+    public static final double TURNOVER_RATE = 0.01;
     public static final double REBOUND_CHANCE = 0.7;
     /**
      * A higher foul difficulty means a defender is less likely to foul
@@ -18,6 +18,7 @@ public class Game {
      * A higher three foul difficulty means a defender is less likely to foul on a three pointer
      */
     public static final double THREE_FOUL_DIFFICULTY = 0.6;
+    private static final double STEAL_CHANCE = 0.3;
 
 
     Team team1;
@@ -126,30 +127,56 @@ public class Game {
 
 
     private void runPossession(){
-        
+        // check for unforced turnover
         if (Math.random() > TURNOVER_RATE + TURNOVER_SCALAR * (Attribute.ATTRIBUTE_MAX - team1.getRosterAttributeMean("Offensive Discipline"))/Attribute.ATTRIBUTE_MAX){
-            ShotAttempt attempt = takeShot(team1, team2);
-            while (!teamstats1.changeScore(attempt) && !attempt.getFouled()) {
-                if (!rebound(team1, teamstats1, team2, teamstats2)) {
-                    break;
+            // check for steal
+            Player stealer = stealAttempt(team2, team1);
+            if (stealer == null){
+                ShotAttempt attempt = takeShot(team1, team2);
+                while (!teamstats1.changeScore(attempt) && !attempt.getFouled()) {
+                    if (!rebound(team1, teamstats1, team2, teamstats2)) {
+                        break;
+                    }
+                    attempt = takeShot(team1, team2);
                 }
-                attempt = takeShot(team1, team2);
+            } else {
+                teamstats2.getStatsFromPlayer(stealer).addSteal();
+                teamstats1.turnover();
             }
-            
+        // unforced turnover by team 1
         } else {
             teamstats1.turnover();
         }
+        // check for unforced turnover
         if (Math.random() > TURNOVER_RATE + TURNOVER_SCALAR * (Attribute.ATTRIBUTE_MAX - team2.getRosterAttributeMean("Offensive Discipline"))/Attribute.ATTRIBUTE_MAX){
-            ShotAttempt attempt = takeShot(team2, team1);
-            while (!teamstats2.changeScore(attempt) && !attempt.getFouled()) {
-                if (!rebound(team2, teamstats2, team1, teamstats1)) {
-                    break;
+            // check for steal
+            Player stealer = stealAttempt(team1, team2);
+            if (stealer == null){
+                ShotAttempt attempt = takeShot(team2, team1);
+                while (!teamstats2.changeScore(attempt) && !attempt.getFouled()) {
+                    if (!rebound(team2, teamstats2, team1, teamstats1)) {
+                        break;
+                    }
+                    attempt = takeShot(team2, team1);
                 }
-                attempt = takeShot(team2, team1);
+            } else {
+                teamstats1.getStatsFromPlayer(stealer).addSteal();
+                teamstats2.turnover();
             }
+        // unforced turnover by team 2
         } else {
             teamstats2.turnover();
         }
+    }
+
+    public Player stealAttempt(Team defenseTeam, Team offenseTeam){
+        
+        Player ballCarrier = offenseTeam.getRoster().getBallHandler();
+        Player defender = defenseTeam.getRoster().getDefender(ballCarrier.getShotLocation());
+        if (defender.getAttributeValue("Steals") * Math.random() * STEAL_CHANCE > Math.random() * (ballCarrier.getAttributeValue("Offensive Discipline") + ballCarrier.getAttributeValue("Dribbling"))){
+            return defender;
+        }
+        return null;
     }
 
     /**

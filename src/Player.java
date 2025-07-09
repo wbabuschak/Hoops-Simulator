@@ -2,6 +2,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Set;
 
 
 
@@ -34,6 +35,8 @@ public class Player {
     public double rebounds;
     public double assists;
     public int gamesPlayed;
+
+    public Team team;
 
     private void parseNames() {
         Scanner scanner;
@@ -94,24 +97,43 @@ public class Player {
         weight = -1;
         age = -1;
         this.role = role;
+        // Rim Finishing affects scoring ability in the paint
         attributes.add(new Attribute("Rim Finishing", 0.0));
+        // Contested Rim Finishing affects scoring ability in the paint when defended heavily
         attributes.add(new Attribute("Contested Rim Finishing", 0.0));
+        // Midrange affects scoring ability in the midrange
         attributes.add(new Attribute("Midrange", 0.0));
+        // Contested Midrange affects scoring ability in the midrange when defended heavily
         attributes.add(new Attribute("Contested Midrange", 0.0));
+        // 3pt affects scoring ability at the three
         attributes.add(new Attribute("3pt", 0.0));
+        // Contested 3pt affects scoring ability at the three when defended heavily
         attributes.add(new Attribute("Contested 3pt", 0.0));
+        // Free Throw affects scoring ability at the FT
         attributes.add(new Attribute("Free Throw", 0.0));
+        // Passing affects ability to generate an assist
         attributes.add(new Attribute("Passing", 0.0));
+        // Paint D affects defense in the paint (and midrange)
         attributes.add(new Attribute("Paint D", 0.0));
+        // Perimeter D affects defense at the three (and midrange)
         attributes.add(new Attribute("Perimeter D", 0.0));
         attributes.add(new Attribute("Stamina", 0.0));
+        // Pace affects number of possessions per game
         attributes.add(new Attribute("Pace", 0.0));
+        // Offensive Discipline affects chance to turn the ball over on offense
         attributes.add(new Attribute("Offensive Discipline", 0.0));
+        // Defensive Discipline affects chance to foul on defense
         attributes.add(new Attribute("Defensive Discipline", 0.0));
+        // Dribbling affects chance to have the ball stolen on offense
         attributes.add(new Attribute("Dribbling", 0.0));
+        // Offensive rebounding affects the chance to grab an offensive rebound
         attributes.add(new Attribute("Offensive Rebounding", 0.0));
+        // Offensive rebounding affects the chance to grab a defensive rebound
         attributes.add(new Attribute("Defensive Rebounding", 0.0));
+        // Hard Fouls affects the chance to for a defender to finishing the shot attempt when fouled
         attributes.add(new Attribute("Hard Fouls", 0.0));
+        // Steals affects the chance to steal the ball on defense
+        attributes.add(new Attribute("Steals", 0.0));
     }
 
     public static Player randomPlayer(Role role, double overall){
@@ -121,64 +143,43 @@ public class Player {
         player.weight = -1;
         player.age = -1;
         
-        switch(role){
+        String[] boostedAttributes;
+
+        switch(role) {
             case PG:
-                for (int i = 0; i < player.getAttributes().size(); i++){
-                    double attValue = overall + (Math.random() * (Attribute.ATTRIBUTE_MAX - overall)) / 2 - (Math.random() * overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Passing")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Dribbling")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Free Throw")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Perimeter D")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    
-                    player.getAttributes().get(i).setValue(Math.min(attValue, Attribute.ATTRIBUTE_MAX));
-                }
+                boostedAttributes = new String[]{"Passing", "Dribbling", "Free Throw", "Perimeter D"};
                 break;
             case SG:
-                for (int i = 0; i < player.getAttributes().size(); i++){
-                    double attValue = overall + (Math.random() * (Attribute.ATTRIBUTE_MAX - overall)) / 2 - (Math.random() * overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("3pt")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Dribbling")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Perimeter D")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Defensive Discipline")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    
-                    player.getAttributes().get(i).setValue(Math.min(attValue, Attribute.ATTRIBUTE_MAX));
-                }
+                boostedAttributes = new String[]{"3pt", "Dribbling", "Perimeter D", "Defensive Discipline"};
                 break;
             case SF:
-                for (int i = 0; i < player.getAttributes().size(); i++){
-                    double attValue = overall + (Math.random() * (Attribute.ATTRIBUTE_MAX - overall)) / 2 - (Math.random() * overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("3pt")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Midrange")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Perimeter D")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Paint D")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    
-                    player.getAttributes().get(i).setValue(Math.min(attValue, Attribute.ATTRIBUTE_MAX));
-                }
+                boostedAttributes = new String[]{"3pt", "Midrange", "Perimeter D", "Paint D"};
                 break;
             case PF:
-                for (int i = 0; i < player.getAttributes().size(); i++){
-                    double attValue = overall + (Math.random() * (Attribute.ATTRIBUTE_MAX - overall)) / 2 - (Math.random() * overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Rim Finishing")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Midrange")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Paint D")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Defensive Discipline")) attValue += POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    player.getAttributes().get(i).setValue(Math.min(attValue, Attribute.ATTRIBUTE_MAX));
-                }
+                boostedAttributes = new String[]{"Rim Finishing", "Midrange", "Paint D", "Defensive Discipline"};
                 break;
             case C:
-                for (int i = 0; i < player.getAttributes().size(); i++){
-                    double attValue = overall + (Math.random() * (Attribute.ATTRIBUTE_MAX - overall)) / 2 - (Math.random() * overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Rim Finishing")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Offensive Rebounding")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Defensive Rebounding")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    if (player.getAttributes().get(i).getName().equals("Paint D")) attValue += overall * POSITIONAL_BOOST * Math.random() + Math.random() * (Attribute.ATTRIBUTE_MAX - overall) / 2;
-                    player.getAttributes().get(i).setValue(Math.min(attValue, Attribute.ATTRIBUTE_MAX));
-                }
+                boostedAttributes = new String[]{"Rim Finishing", "Offensive Rebounding", "Defensive Rebounding", "Paint D"};
                 break;
             default:
                 return randomPlayer(Role.values()[new Random().nextInt(Role.values().length)], overall);
         }
-        
+                
+        for (int i = 0; i < player.getAttributes().size(); i++) {
+            Attribute attribute = player.getAttributes().get(i);
+            double attValue = overall + (Math.random() * (Attribute.ATTRIBUTE_MAX - overall)) / 2 - (Math.random() * overall) / 2;
+            for (String name : boostedAttributes) {
+                if (attribute.getName().equals(name)) {
+                    attValue += POSITIONAL_BOOST * Math.random() * (Attribute.ATTRIBUTE_MAX - overall);
+                    break;
+                }
+            }
+
+            attValue = Math.max(attValue, 0);
+            attValue = Math.min(attValue, Attribute.ATTRIBUTE_MAX);
+            attribute.setValue(attValue);
+        }
+
         return player;
     }
 
@@ -193,12 +194,17 @@ public class Player {
         return name;
     }
 
+    public Team getTeam(){
+        return team;
+    }
+
     /**
      * only to be used for setting attributes en masse
      */
     public ArrayList<Attribute> getAttributes(){
         return attributes;
     }
+
 
     public int overall(){
         double sum = 0;

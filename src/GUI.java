@@ -204,7 +204,7 @@ public class GUI {
                     return;
                 }
                 int gamesPlayed = MVP.gamesPlayed;
-                taBest.setText(MVP.toString() + " " + (int) (MVP.points / gamesPlayed) + "/" + (int) (MVP.rebounds / gamesPlayed) + "/" + (int) (MVP.assists / gamesPlayed));
+                taBest.setText(MVP.toString() + " " + (int) (MVP.points / gamesPlayed) + "/" + (int) (MVP.rebounds / gamesPlayed) + "/" + (int) (MVP.assists / gamesPlayed) + "\n" + MVP.getTeam());
             });
 
         JButton btnPerf = new JButton("Find Best Performance");

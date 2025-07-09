@@ -4,11 +4,11 @@ public class Roster {
     public static double skillReliance = 3.0;
     public static final int MINUTES_RFACTOR = 5;
     public static final double ASSIST_RATE = 0.3;
-    public static final int ASSIST_MINUTES_FACTOR = 4;
     public static final double ASSIST_SKILL_FACTOR = 7.0;
-    public static final int REBOUND_MINUTES_FACTOR = 4;
     public static final double REBOUND_SKILL_FACTOR = 2.0;
-    public static final int SHOOTING_MINUTES_FACTOR = 5;
+    public static final int MINUTES_FACTOR = 4;
+
+    public Team team;
 
     private int[] minutes = {};
     public Player[] players;
@@ -119,6 +119,7 @@ public class Roster {
             return false;
         }
         players[pos] = player;
+        player.team = team;
         return true;
     }
 
@@ -136,8 +137,14 @@ public class Roster {
         if (pos >= players.length){
             return null;
         }
+
         Player replaced = players[pos];
+        Team replacedTeam = replaced.team;
+        replaced.team = players[pos].team;
+        
         players[pos] = player;
+        players[pos].team = replacedTeam;
+
         return replaced;
     }
     /**
@@ -184,9 +191,10 @@ public class Roster {
     }
 
 
-    public Roster(){
+    public Roster(Team team){
         players = new Player[ROSTER_SIZE];
         minutes = new int[ROSTER_SIZE];
+        this.team = team;
         for (int i = 0; i < ROSTER_SIZE; i++){
             minutes[i] = calculateRosterMinutes(i);
         }
@@ -249,7 +257,7 @@ public class Roster {
             if (getMinutes()[i] == 0){
                 continue;
             }
-            total += Math.pow(getMinutes()[i], REBOUND_MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Offensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE, REBOUND_SKILL_FACTOR);
+            total += Math.pow(getMinutes()[i], MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Offensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE, REBOUND_SKILL_FACTOR);
         }
         double r = Math.random() * total;
         double cumulative = 0.0;
@@ -258,7 +266,31 @@ public class Roster {
             if (getMinutes()[i] == 0){
                 continue;
             }
-            cumulative += Math.pow(getMinutes()[i], REBOUND_MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Offensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE, REBOUND_SKILL_FACTOR);
+            cumulative += Math.pow(getMinutes()[i], MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Offensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE, REBOUND_SKILL_FACTOR);
+            if (r <= cumulative) {
+                return getPlayer(i);
+            }
+        }
+        // should never return null
+        return null;
+    }
+
+    public Player getBallHandler(){
+        double total = 0.0;
+        for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
+            if (getMinutes()[i] == 0){
+                continue;
+            }
+            total += Math.pow(getMinutes()[i], MINUTES_FACTOR) * (getPlayer(i).getAttributeValue("Offensive Discipline"));
+        }
+        double r = Math.random() * total;
+        double cumulative = 0.0;
+
+        for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
+            if (getMinutes()[i] == 0){
+                continue;
+            }
+            cumulative += Math.pow(getMinutes()[i], MINUTES_FACTOR) * (getPlayer(i).getAttributeValue("Offensive Discipline"));
             if (r <= cumulative) {
                 return getPlayer(i);
             }
@@ -274,7 +306,7 @@ public class Roster {
                 continue;
             }
             //System.out.println("total: " + total);
-            total += Math.pow(getMinutes()[i], REBOUND_MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Defensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE, REBOUND_SKILL_FACTOR);
+            total += Math.pow(getMinutes()[i], MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Defensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE, REBOUND_SKILL_FACTOR);
         }
         double r = Math.random() * total;
         double cumulative = 0.0;
@@ -285,7 +317,7 @@ public class Roster {
                 continue;
             }
             //System.out.println("cumulative: " + cumulative);
-            cumulative += Math.pow(getMinutes()[i], REBOUND_MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Defensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE, REBOUND_SKILL_FACTOR);
+            cumulative += Math.pow(getMinutes()[i], MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Defensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE, REBOUND_SKILL_FACTOR);
             if (r <= cumulative) {
                 return getPlayer(i);
             }
@@ -300,7 +332,7 @@ public class Roster {
             if (getMinutes()[i] == 0){
                 continue;
             }
-            total += Math.pow(getMinutes()[i], ASSIST_MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE, ASSIST_SKILL_FACTOR) ;
+            total += Math.pow(getMinutes()[i], MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE, ASSIST_SKILL_FACTOR) ;
         }
         double r = Math.random() * total;
         double cumulative = 0.0;
@@ -309,7 +341,7 @@ public class Roster {
             if (getMinutes()[i] == 0){
                 continue;
             }
-            cumulative += Math.pow(getMinutes()[i], ASSIST_MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE, ASSIST_SKILL_FACTOR) ;
+            cumulative += Math.pow(getMinutes()[i], MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE, ASSIST_SKILL_FACTOR) ;
             if (r <= cumulative) {
                 if (((getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_MAX) * ASSIST_RATE > Math.random())){
                     return getPlayer(i);

@@ -8,7 +8,17 @@ public class PlayerStats {
     private int turnovers;
     private int oRebounds;
     private int dRebounds;
+    private int steals;
     
+    public int getSteals() {
+        return steals;
+    }
+
+    public void addSteal() {
+        steals++;
+    }
+
+
     public int minutes;
 
     public int getMinutes() {
@@ -145,8 +155,9 @@ public class PlayerStats {
         int DREB = getDRebounds();
         int ASS = getAssists();
         int TO = getTurnovers();
+        int STL = getSteals();
 
-        return (double) (2 * PTS - 0.5 * FTA - FGA + 0.5 * DREB + 1.0 * OREB + 2.0 * ASS - 3.0 * TO);
+        return (double) (2 * PTS - 0.5 * FTA - FGA + 0.5 * DREB + 1.0 * OREB + 1.5 * ASS - 3.0 * TO + 2.5 * STL);
     }
     
     public String toString() {
@@ -181,6 +192,13 @@ public class PlayerStats {
                 ? String.format("%-8s", madeThrees() + " 3pt")
                 : String.format("%-8s", "");
         sb.append(threePtString);
+        sb.append(" | ");
+
+        // OREB string
+        String stealsString = (getSteals() > 0)
+                ? String.format("%-8s", getSteals() + " STL")
+                : String.format("%-8s", "");
+        sb.append(stealsString);
         sb.append(" | ");
 
         // OREB string

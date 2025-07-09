@@ -90,7 +90,7 @@ public enum Archetype {
     MENACE {
         @Override
         public double score(Player player) {
-            return player.getAttributeValue("Offensive Rebounding") +
+            return player.getAttributeValue("Steals") +
                    player.getAttributeValue("Defensive Rebounding") +
                    player.getAttributeValue("Hard Fouls");
         }
@@ -133,6 +133,14 @@ public enum Archetype {
             return player.getAttributeValue("Dribbling") +
                    player.getAttributeValue("Offensive Discipline") +
                    player.getAttributeValue("Rim Finishing");
+        }
+    },
+    THE_GLOVE {
+        @Override
+        public double score(Player player) {
+            return player.getAttributeValue("Steals") +
+                   player.getAttributeValue("Defensive Discipline") +
+                   player.getAttributeValue("Perimeter D");
         }
     },
     THREE_LEVEL_SCORER {
