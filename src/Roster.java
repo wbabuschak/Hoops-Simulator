@@ -1,11 +1,11 @@
 public class Roster {
     public static final int ROSTER_SIZE = 12;
     public static boolean forceRosterLimit = false;
-    public static double skillReliance = 3.0;
+    public static double skillReliance = 5.0;
     public static final int MINUTES_RFACTOR = 5;
     public static final double ASSIST_RATE = 0.3;
     public static final double ASSIST_SKILL_FACTOR = 7.0;
-    public static final double REBOUND_SKILL_FACTOR = 2.0;
+    public static final double REBOUND_SKILL_FACTOR = 3.0;
     public static final int MINUTES_FACTOR = 4;
 
     public Team team;

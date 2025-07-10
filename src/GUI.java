@@ -6,10 +6,10 @@ import java.util.ArrayList;
 
 
 public class GUI {
-    String title = "Hoops Simulator 0.0.4";
-    public static final int FREE_AGENTS = 1000;
+    String title = "Hoops Simulator 0.0.5";
+    public static final int FREE_AGENTS = 700;
 
-    private int noTeams = 16;
+    private int noTeams = 24;
 
     private Team team1;
     private Team team2;
@@ -36,9 +36,9 @@ public class GUI {
     private JScrollPane playerView;
     private JList<Attribute> attributeList;
 
-    private JLabel playerArchetype;
+    private JTextArea playerArchetype;
     
-    private GameManager gameManager;
+    private Season season;
     private JList<Game> gameList;
 
     private JLabel matchupRecord;
@@ -55,7 +55,7 @@ public class GUI {
     private JPanel buttonPanel = new JPanel(new GridLayout(4,4,2,2));
 
     public GUI(){
-        gameManager = new GameManager();
+        season = new Season();
         backFrame = new JFrame();
         mainPanel = new JPanel();
 
@@ -65,7 +65,7 @@ public class GUI {
         taMatchup.setEditable(false);
         taMatchup.setFont(new Font("Monospaced",Font.PLAIN,12));
         gameScrollPane = new JScrollPane(taMatchup);
-        gameScrollPane.setPreferredSize(new Dimension(720, 240));
+        gameScrollPane.setPreferredSize(new Dimension(720, 360));
 
         btnSetTeam1 = new JButton("Set Home Team");
         btnSetTeam1.addActionListener(e -> {
@@ -101,7 +101,7 @@ public class GUI {
         randomizeTeams();
         teamList = new JList<>(teams);
         teamScrollPane = new JScrollPane(teamList);
-        teamScrollPane.setPreferredSize(new Dimension(240, 240));
+        teamScrollPane.setPreferredSize(new Dimension(215, 240));
         teamList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(
@@ -121,9 +121,9 @@ public class GUI {
             }
         });
                 
-        gameList = new JList<>(gameManager.games.toArray(new Game[0]));
+        gameList = new JList<>(season.games.toArray(new Game[0]));
         gameLog = new JScrollPane(gameList);
-        gameLog.setPreferredSize(new Dimension(320, 320));
+        gameLog.setPreferredSize(new Dimension(480, 120));
         gameList.addListSelectionListener(e -> {
             if (!gameList.isSelectionEmpty()){
                 taMatchup.setText(gameList.getSelectedValue().toString(true));
@@ -133,12 +133,12 @@ public class GUI {
 
         playerList = new JList<>();
         teamView = new JScrollPane(playerList);
-        teamView.setPreferredSize(new Dimension(240, 240));
+        teamView.setPreferredSize(new Dimension(280, 240));
         teamList.addListSelectionListener(e -> updateTeamView());
 
         attributeList = new JList<>();
         playerView = new JScrollPane(attributeList);
-        playerView.setPreferredSize(new Dimension(240, 240));
+        playerView.setPreferredSize(new Dimension(215, 240));
         playerList.addListSelectionListener(e -> {
             updatePlayerView(0);
         });
@@ -149,7 +149,7 @@ public class GUI {
 
         freeAgentList = new JList<>(freeAgents);
         freeAgentScrollPane = new JScrollPane(freeAgentList);
-        freeAgentScrollPane.setPreferredSize(new Dimension(240, 240));
+        freeAgentScrollPane.setPreferredSize(new Dimension(280, 240));
         freeAgentList.addListSelectionListener(e -> {
             updatePlayerView(1);
         });
@@ -169,7 +169,12 @@ public class GUI {
             }
         });
 
-        playerArchetype = new JLabel();
+        playerArchetype = new JTextArea();
+        playerArchetype.setEditable(false);
+        playerArchetype.setOpaque(false);
+        playerArchetype.setPreferredSize(new Dimension(215, 120));
+        playerArchetype.setFocusable(false);
+        playerArchetype.setFont(new Font("SansSerif", Font.BOLD, 16));
 
         mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15)); 
         mainPanel.setLayout(new GridBagLayout());
@@ -183,7 +188,7 @@ public class GUI {
 
         btnPlayAll = new JButton("Simulate round robin");
         btnPlayAll.addActionListener(e -> {
-            gameManager.playAll(teams);
+            season.playAll(teams);
             updateGameLog();
             teamList.setListData(teams);
             updateMatchupLabel();
@@ -198,7 +203,7 @@ public class GUI {
         
         btnMVP.addActionListener(
             e -> {
-                Player MVP = gameManager.findMVP();
+                Player MVP = season.findMVP();
                 if (MVP == null){
                     taBest.setText("");
                     return;
@@ -210,7 +215,7 @@ public class GUI {
         JButton btnPerf = new JButton("Find Best Performance");
         btnPerf.addActionListener(
             e -> {
-                PlayerStats best = gameManager.findBestPerformance();
+                PlayerStats best = season.findBestPerformance();
                 if (best == null){
                     taBest.setText("");
                     return;
@@ -265,6 +270,15 @@ public class GUI {
         for (int i = 0; i < noTeams; i++){
             teams[i] = Team.randomTeam();
         }
+        
+        // // testing zone
+        // for (int j = 0; j < Role.values().length; j++){
+        //     for (int i = 0; i < teams[j].getRoster().noPlayers(); i++){
+        //         teams[j].getRoster().replacePlayer(i, Player.randomPlayer((Role.values()[j])));
+        //     }
+        //     teams[j].getRoster().teamSort();
+        //     teams[j].setName((Role.values()[j]).name());
+        // }
     }
 
     private void addElement(JComponent component, int x, int y){
@@ -369,7 +383,7 @@ public class GUI {
         }
         Game game = new Game(team1, team2);
         game.playGame();
-        gameManager.addGame(game);
+        season.addGame(game);
         updateGameLog();
         taMatchup.setText(game.toString(true));
         taMatchup.setCaretPosition(0);
@@ -383,10 +397,10 @@ public class GUI {
             matchupRecord.setText(" - ");
             return;
         }
-        for (int i = 0; i < gameManager.games.size(); i++){
-            if (gameManager.games.get(i).getWinner() == team1 && (gameManager.games.get(i).team1 == team2 || gameManager.games.get(i).team2 == team2)){
+        for (int i = 0; i < season.games.size(); i++){
+            if (season.games.get(i).getWinner() == team1 && (season.games.get(i).team1 == team2 || season.games.get(i).team2 == team2)){
                 i1++;
-            } else if (gameManager.games.get(i).getWinner() == team2 && (gameManager.games.get(i).team1 == team1 || gameManager.games.get(i).team2 == team1)){
+            } else if (season.games.get(i).getWinner() == team2 && (season.games.get(i).team1 == team1 || season.games.get(i).team2 == team1)){
                 i2++;
             }
         }
@@ -394,7 +408,7 @@ public class GUI {
     }
 
     private void updateGameLog(){
-        gameList.setListData(gameManager.games.toArray(new Game[0]));
+        gameList.setListData(season.games.toArray(new Game[0]));
         gameList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus){
@@ -434,8 +448,8 @@ public class GUI {
                 break;
             default: return;
         }
-
-        playerArchetype.setText(Archetype.findArchetype(list.getSelectedValue()).name());
+        Player player = list.getSelectedValue();
+        playerArchetype.setText(player.getName() + "\n" + player.role.name() + "\n"+ Player.toFeet(player.getHeight()) + "\n" + player.getWeight() + " lbs\n" + Archetype.findArchetype(player).name());
     }
 
     private void populateFreeAgents(){

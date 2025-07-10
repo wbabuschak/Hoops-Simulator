@@ -12,7 +12,7 @@ public class Game {
     /**
      * A higher foul difficulty means a defender is less likely to foul
      */
-    public static final double FOUL_DIFFICULTY = 15;
+    public static final double FOUL_DIFFICULTY = 10;
 
     /**
      * A higher three foul difficulty means a defender is less likely to foul on a three pointer
@@ -123,7 +123,7 @@ public class Game {
             PlayerStats playerStats = teamStats.getStatsFromPlayer(player);
             playerStats.setMinutes(playerStats.getMinutes() + finalMinutes[i]);
         }
-}
+    }
 
 
     private void runPossession(){

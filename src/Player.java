@@ -1,5 +1,6 @@
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
@@ -8,17 +9,21 @@ import java.util.Set;
 
 public class Player {
     public static final double OVERALL_SCALAR = 2.5;
-    public static final double POSITIONAL_BOOST = 0.25;
+    public static final double POSITIONAL_BOOST = 0.1;
 
     private String name;
     /**
      * Height units: Inches
      */
     private int height;
+    
+
     /**
      * Weight units: Pounds
      */
     private int weight;
+    
+
     /**
      * Age units: Years
      */
@@ -37,6 +42,22 @@ public class Player {
     public int gamesPlayed;
 
     public Team team;
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
 
     private void parseNames() {
         Scanner scanner;
@@ -136,47 +157,94 @@ public class Player {
         attributes.add(new Attribute("Steals", 0.0));
     }
 
-    public static Player randomPlayer(Role role, double overall){
+    public static Player randomPlayer(Role role, double overall) {
         Player player = new Player(role);
         player.name = randomName();
-        player.height = -1;
         player.weight = -1;
         player.age = -1;
-        
-        String[] boostedAttributes;
 
-        switch(role) {
+        // Determine position-specific boosted attributes and height
+        String[] boostedAttributes;
+        double heightRng = Math.random();
+
+        switch (role) {
             case PG:
                 boostedAttributes = new String[]{"Passing", "Dribbling", "Free Throw", "Perimeter D"};
+                player.height = 72 + (int) (heightRng * 5); // 6' - 6'4"
                 break;
             case SG:
                 boostedAttributes = new String[]{"3pt", "Dribbling", "Perimeter D", "Defensive Discipline"};
+                player.height = 73 + (int) (heightRng * 5); // 6'1 - 6'5"
                 break;
             case SF:
                 boostedAttributes = new String[]{"3pt", "Midrange", "Perimeter D", "Paint D"};
+                player.height = 76 + (int) (heightRng * 6); // 6'4 - 6'9"
                 break;
             case PF:
                 boostedAttributes = new String[]{"Rim Finishing", "Midrange", "Paint D", "Defensive Discipline"};
+                player.height = 79 + (int) (heightRng * 6); // 6'7 - 7'
                 break;
             case C:
                 boostedAttributes = new String[]{"Rim Finishing", "Offensive Rebounding", "Defensive Rebounding", "Paint D"};
+                player.height = 81 + (int) (heightRng * 7); // 6'9 - 7'3"
                 break;
             default:
-                return randomPlayer(Role.values()[new Random().nextInt(Role.values().length)], overall);
+                return randomPlayer(
+                    Role.values()[new Random().nextInt(Role.values().length)],
+                    overall
+                );
         }
-                
-        for (int i = 0; i < player.getAttributes().size(); i++) {
-            Attribute attribute = player.getAttributes().get(i);
-            double attValue = overall + (Math.random() * (Attribute.ATTRIBUTE_MAX - overall)) / 2 - (Math.random() * overall) / 2;
+
+        
+        int neutralHeight = 78;
+        int heightDifference = player.height - neutralHeight;
+        player.weight = (int) (210 + heightDifference * 10 * ((Math.random() + Math.random() + Math.random()) / 3));
+        List<String> tallerBoosts = List.of(
+             "Paint D", "Defensive Consistency", "Offensive Rebounding", "Defensive Rebounding"
+        );
+
+        List<String> tallerPenalties = List.of(
+            "Dribbling", "Perimeter D", "Offensive Consistency", "Free Throw"
+        );
+        
+
+        double boostPerInch = 3.0;
+        double penaltyPerInch = 3.0;
+
+        for (Attribute attribute : player.getAttributes()) {
+            double attValue =
+                    overall +
+                    (Math.random() * (Attribute.ATTRIBUTE_MAX - overall)) / 2
+                    - (Math.random() * overall) / 2;
+
+            // Apply positional boost
             for (String name : boostedAttributes) {
                 if (attribute.getName().equals(name)) {
-                    attValue += POSITIONAL_BOOST * Math.random() * (Attribute.ATTRIBUTE_MAX - overall);
+                    attValue += POSITIONAL_BOOST *
+                                Math.random() *
+                                (Attribute.ATTRIBUTE_MAX - overall);
                     break;
                 }
             }
 
-            attValue = Math.max(attValue, 0);
-            attValue = Math.min(attValue, Attribute.ATTRIBUTE_MAX);
+            // Apply height effects
+            if (heightDifference != 0) {
+                if (heightDifference > 0) {
+                    if (tallerBoosts.contains(attribute.getName())) {
+                        attValue += heightDifference * Math.random() * boostPerInch;
+                    } else if (tallerPenalties.contains(attribute.getName())) {
+                        attValue -= heightDifference * Math.random() * penaltyPerInch;
+                    }
+                } else {
+                    if (tallerBoosts.contains(attribute.getName())) {
+                        attValue += heightDifference * Math.random() * penaltyPerInch;
+                    } else if (tallerPenalties.contains(attribute.getName())) {
+                        attValue -= heightDifference * Math.random() * boostPerInch;
+                    }
+                }
+            }
+
+            attValue = Math.max(0, Math.min(attValue, Attribute.ATTRIBUTE_MAX));
             attribute.setValue(attValue);
         }
 
@@ -216,7 +284,7 @@ public class Player {
 
     public String toString(){
         
-        return role + " " + name + " (" + overall() + ")";
+        return toFeet(height) + " " + role + " " + name + " (" + overall() + ")";
     }
 
     public static String randomName(){
@@ -246,6 +314,15 @@ public class Player {
     public boolean equals(Player player){
         // System.out.println("\tDEBUG: " + player.toString() + " == " + toString() + " " + player.toString().equals(toString()));
         return player.toString().equals(toString());
+    }
+
+    public static String toFeet(int inches){
+        int feet = inches / 12;
+        int r = inches % 12;
+        if (r == 0){
+            return feet + "'";
+        }
+        return feet + "'" + r;
     }
 
     

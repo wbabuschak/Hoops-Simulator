@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class GameManager {
+public class Season {
     public ArrayList<Game> games = new ArrayList<Game>();
     public ArrayList<Player> players = new ArrayList<Player>();
     
@@ -42,17 +42,24 @@ public class GameManager {
         if (games.isEmpty()) return null;
         // find and order every player
         findPlayers();
+        for (Player p : players) {
+            p.points = 0;
+            p.rebounds = 0;
+            p.assists = 0;
+            p.gamesPlayed = 0;
+        }
         // attribute every player's stats and games played
         int[] gamesPlayed = new int[players.size()];
         double[] totalBPER = new double[players.size()];
         for (int i = 0; i < games.size(); i++){
             for (int j = 0; j < games.get(i).teamstats1.getPlayerStats().size(); j++){
                 Player playerWithStats = games.get(i).teamstats1.getPlayerStats().get(j).player;
-                if (players.indexOf(playerWithStats) == -1){
+                int playerIndex = players.indexOf(playerWithStats);
+                if (playerIndex == -1){
                     continue;
                 }
-                gamesPlayed[players.indexOf(playerWithStats)]++;
-                totalBPER[players.indexOf(playerWithStats)] += games.get(i).teamstats1.getPlayerStats().get(j).calculateBPER();
+                gamesPlayed[playerIndex]++;
+                totalBPER[playerIndex] += games.get(i).teamstats1.getPlayerStats().get(j).calculateBPER();
                 playerWithStats.points += games.get(i).teamstats1.getPlayerStats().get(j).getPoints();
                 playerWithStats.rebounds += games.get(i).teamstats1.getPlayerStats().get(j).getRebounds();
                 playerWithStats.assists += games.get(i).teamstats1.getPlayerStats().get(j).getAssists();
@@ -60,11 +67,12 @@ public class GameManager {
             }
             for (int j = 0; j < games.get(i).teamstats2.getPlayerStats().size(); j++){
                 Player playerWithStats = games.get(i).teamstats2.getPlayerStats().get(j).player;
-                if (players.indexOf(playerWithStats) == -1){
+                int playerIndex = players.indexOf(playerWithStats);
+                if (playerIndex == -1){
                     continue;
                 }
-                gamesPlayed[players.indexOf(playerWithStats)]++;
-                totalBPER[players.indexOf(playerWithStats)] += games.get(i).teamstats2.getPlayerStats().get(j).calculateBPER();
+                gamesPlayed[playerIndex]++;
+                totalBPER[playerIndex] += games.get(i).teamstats2.getPlayerStats().get(j).calculateBPER();
                 playerWithStats.points += games.get(i).teamstats2.getPlayerStats().get(j).getPoints();
                 playerWithStats.rebounds += games.get(i).teamstats2.getPlayerStats().get(j).getRebounds();
                 playerWithStats.assists += games.get(i).teamstats2.getPlayerStats().get(j).getAssists();

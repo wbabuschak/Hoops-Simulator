@@ -157,7 +157,7 @@ public class PlayerStats {
         int TO = getTurnovers();
         int STL = getSteals();
 
-        return (double) (2 * PTS - 0.5 * FTA - FGA + 0.5 * DREB + 1.0 * OREB + 1.5 * ASS - 3.0 * TO + 2.5 * STL);
+        return (double) (2 * PTS - 0.5 * FTA - FGA + 1.0 * DREB + 1.5 * OREB + 1.5 * ASS - 3.0 * TO + 2.0 * STL);
     }
     
     public String toString() {
