@@ -66,6 +66,8 @@ public class Game {
         team2.gamesPlayed++;
     }
 
+    
+
     private void addPlayerMinutes(TeamStats teamStats, Team team, boolean isOvertime) {
         Random rng = new Random();
         Roster roster = team.getRoster();
@@ -126,46 +128,31 @@ public class Game {
     }
 
 
-    private void runPossession(){
-        // check for unforced turnover
-        if (Math.random() > TURNOVER_RATE + TURNOVER_SCALAR * (Attribute.ATTRIBUTE_MAX - team1.getRosterAttributeMean("Offensive Discipline"))/Attribute.ATTRIBUTE_MAX){
-            // check for steal
-            Player stealer = stealAttempt(team2, team1);
-            if (stealer == null){
-                ShotAttempt attempt = takeShot(team1, team2);
-                while (!teamstats1.changeScore(attempt) && !attempt.getFouled()) {
-                    if (!rebound(team1, teamstats1, team2, teamstats2)) {
+    private void runPossession() {
+        runTeamPossession(team1, teamstats1, team2, teamstats2);
+        runTeamPossession(team2, teamstats2, team1, teamstats1);
+    }
+
+    private void runTeamPossession(Team offenseTeam, TeamStats offenseTeamStats, Team defenseTeam, TeamStats defenseTeamStats) {
+        double turnoverThreshold = TURNOVER_RATE + TURNOVER_SCALAR * (Attribute.ATTRIBUTE_MAX - offenseTeam.getRosterAttributeMean("Offensive Discipline")) / Attribute.ATTRIBUTE_MAX;
+        // unforced turnover check
+        if (Math.random() > turnoverThreshold) {
+            // steal attempt
+            Player stealer = stealAttempt(defenseTeam, offenseTeam);
+            if (stealer == null) {
+                ShotAttempt attempt = takeShot(offenseTeam, offenseTeamStats, defenseTeam, defenseTeamStats);
+                while (!offenseTeamStats.changeScore(attempt) && !attempt.getFouled()) {
+                    if (!rebound(offenseTeam, offenseTeamStats, defenseTeam, defenseTeamStats)) {
                         break;
                     }
-                    attempt = takeShot(team1, team2);
+                    attempt = takeShot(offenseTeam, offenseTeamStats, defenseTeam, defenseTeamStats);
                 }
             } else {
-                teamstats2.getStatsFromPlayer(stealer).addSteal();
-                teamstats1.turnover();
+                defenseTeamStats.getStatsFromPlayer(stealer).addSteal();
+                offenseTeamStats.turnover();
             }
-        // unforced turnover by team 1
         } else {
-            teamstats1.turnover();
-        }
-        // check for unforced turnover
-        if (Math.random() > TURNOVER_RATE + TURNOVER_SCALAR * (Attribute.ATTRIBUTE_MAX - team2.getRosterAttributeMean("Offensive Discipline"))/Attribute.ATTRIBUTE_MAX){
-            // check for steal
-            Player stealer = stealAttempt(team1, team2);
-            if (stealer == null){
-                ShotAttempt attempt = takeShot(team2, team1);
-                while (!teamstats2.changeScore(attempt) && !attempt.getFouled()) {
-                    if (!rebound(team2, teamstats2, team1, teamstats1)) {
-                        break;
-                    }
-                    attempt = takeShot(team2, team1);
-                }
-            } else {
-                teamstats1.getStatsFromPlayer(stealer).addSteal();
-                teamstats2.turnover();
-            }
-        // unforced turnover by team 2
-        } else {
-            teamstats2.turnover();
+            offenseTeamStats.turnover();
         }
     }
 
@@ -198,36 +185,24 @@ public class Game {
     }
     
 
-    private ShotAttempt takeShot(Team shootingTeam, Team defendingTeam){
+    private ShotAttempt takeShot(Team shootingTeam, TeamStats shootingTeamStats, Team defendingTeam, TeamStats defendingTeamStats){
         Player shootingPlayer = shootingTeam.getRoster().chooseShooterAtRandom();
+        PlayerStats shootingPlayerStats = shootingTeamStats.getPlayerStats().get(shootingTeam.getRoster().getPosition(shootingPlayer));
         Player assister = shootingTeam.getRoster().getAssister();
         ShotAttempt shotAttempt = new ShotAttempt(shootingPlayer, shootingTeam, defendingTeam, shootingPlayer.getShotLocation(), assister != null);
         int fts = foulChance(shotAttempt);
-        if (shootingTeam == team1){
-            if (fts == 0 || fts == 1){
-                teamstats1.getPlayerStats().get(shootingTeam.getRoster().getPosition(shootingPlayer)).addShotAttempt(shotAttempt);
-                if (shotAttempt.make() > 1 && assister != null) teamstats1.getPlayerStats().get(shootingTeam.getRoster().getPosition(assister)).addAssist();
-            }
-            for (int i = 0; i < fts; i++){
-                ShotAttempt ft = new ShotAttempt(shootingPlayer, shootingTeam, defendingTeam, CourtLocations.FT, false);
-                teamstats1.getPlayerStats().get(shootingTeam.getRoster().getPosition(shootingPlayer)).addShotAttempt(ft);
-                teamstats1.changeScore(ft);
-            }
-        } else if (shootingTeam == team2){
-            if (fts == 0 || fts == 1){
-                teamstats2.getPlayerStats().get(shootingTeam.getRoster().getPosition(shootingPlayer)).addShotAttempt(shotAttempt);
-                if (shotAttempt.make() > 1 && assister != null) teamstats2.getPlayerStats().get(shootingTeam.getRoster().getPosition(assister)).addAssist();
-            }
-            for (int i = 0; i < fts; i++){
-                ShotAttempt ft = new ShotAttempt(shootingPlayer, shootingTeam, defendingTeam, CourtLocations.FT, false);
-                teamstats2.getPlayerStats().get(shootingTeam.getRoster().getPosition(shootingPlayer)).addShotAttempt(ft);
-                teamstats2.changeScore(ft);
-            }
-        } else {
-            System.out.println("CRITICAL ERROR: shooting team not in game");
-            return null;
+        
+        if (fts <= 1){
+            shootingPlayerStats.addShotAttempt(shotAttempt);
+            if (shotAttempt.make() > 1 && assister != null) shootingTeamStats.getPlayerStats().get(shootingTeam.getRoster().getPosition(assister)).addAssist();
         }
-        return(shotAttempt);
+        for (int i = 0; i < fts; i++){
+            ShotAttempt ft = new ShotAttempt(shootingPlayer, shootingTeam, defendingTeam, CourtLocations.FT, false);
+            shootingPlayerStats.addShotAttempt(ft);
+            shootingTeamStats.changeScore(ft);
+        }
+
+        return shotAttempt;
     }
 
     /**

@@ -51,6 +51,7 @@ public class GUI {
     Player[] freeAgents;
 
     private JButton btnAddFreeAgent;
+    private JButton btnPrintSeason;
 
     private JPanel buttonPanel = new JPanel(new GridLayout(4,4,2,2));
 
@@ -101,7 +102,7 @@ public class GUI {
         randomizeTeams();
         teamList = new JList<>(teams);
         teamScrollPane = new JScrollPane(teamList);
-        teamScrollPane.setPreferredSize(new Dimension(215, 240));
+        teamScrollPane.setPreferredSize(new Dimension(225, 240));
         teamList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(
@@ -138,7 +139,7 @@ public class GUI {
 
         attributeList = new JList<>();
         playerView = new JScrollPane(attributeList);
-        playerView.setPreferredSize(new Dimension(215, 240));
+        playerView.setPreferredSize(new Dimension(225, 240));
         playerList.addListSelectionListener(e -> {
             updatePlayerView(0);
         });
@@ -172,7 +173,7 @@ public class GUI {
         playerArchetype = new JTextArea();
         playerArchetype.setEditable(false);
         playerArchetype.setOpaque(false);
-        playerArchetype.setPreferredSize(new Dimension(215, 120));
+        playerArchetype.setPreferredSize(new Dimension(225, 140));
         playerArchetype.setFocusable(false);
         playerArchetype.setFont(new Font("SansSerif", Font.BOLD, 16));
 
@@ -192,6 +193,7 @@ public class GUI {
             updateGameLog();
             teamList.setListData(teams);
             updateMatchupLabel();
+            season.updateStats();
         });
         
         taBest = new JTextArea();
@@ -227,6 +229,9 @@ public class GUI {
         btnAddFreeAgent = new JButton("Add Free Agent");
         btnAddFreeAgent.addActionListener(e -> addFreeAgent());
 
+        btnPrintSeason = new JButton("Print Season");
+        btnPrintSeason.addActionListener(e -> season.exportSeasonReportCSV("season_report.csv",teams));
+
         
         buttonPanel.add(btnSimulate);
         buttonPanel.add(btnPlayAll);
@@ -237,6 +242,7 @@ public class GUI {
         buttonPanel.add(btnSetTeam2);
         
         buttonPanel.add(btnAddFreeAgent);
+        buttonPanel.add(btnPrintSeason);
 
         addElement(iconImage, 0, 0);
         addElement(teamScrollPane,2,0);
@@ -388,6 +394,7 @@ public class GUI {
         taMatchup.setText(game.toString(true));
         taMatchup.setCaretPosition(0);
         updateMatchupLabel();
+        season.updateStats();
     }
 
     private void updateMatchupLabel(){
@@ -449,7 +456,14 @@ public class GUI {
             default: return;
         }
         Player player = list.getSelectedValue();
-        playerArchetype.setText(player.getName() + "\n" + player.role.name() + "\n"+ Player.toFeet(player.getHeight()) + "\n" + player.getWeight() + " lbs\n" + Archetype.findArchetype(player).name());
+        int gamesPlayed = player.gamesPlayed;
+        playerArchetype.setText(
+            player.getName() + "\n" + 
+            player.role.name() + "\n" + 
+            Player.toFeet(player.getHeight()) + "\n" + 
+            player.getWeight() + " lbs\n" + 
+            (int) (player.points / gamesPlayed) + "/" + (int) (player.rebounds / gamesPlayed) + "/" + (int) (player.assists / gamesPlayed) + "\n" +
+            Archetype.findArchetype(player).name());
     }
 
     private void populateFreeAgents(){

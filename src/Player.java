@@ -34,12 +34,21 @@ public class Player {
 
     public Role role;
 
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
     public ArrayList<Attribute> attributes = new ArrayList<>();
 
     public double points;
     public double rebounds;
     public double assists;
     public int gamesPlayed;
+    public double cumBPER;
 
     public Team team;
 
@@ -204,7 +213,7 @@ public class Player {
         );
 
         List<String> tallerPenalties = List.of(
-            "Dribbling", "Perimeter D", "Offensive Consistency", "Free Throw"
+            "Dribbling", "Perimeter D", "Free Throw", "Passing"
         );
         
 

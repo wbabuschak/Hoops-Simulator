@@ -1,11 +1,11 @@
 public class Roster {
     public static final int ROSTER_SIZE = 12;
     public static boolean forceRosterLimit = false;
-    public static double skillReliance = 5.0;
+    public static final double SHOOTING_SKILL_FACTOR = 3.0;
     public static final int MINUTES_RFACTOR = 5;
     public static final double ASSIST_RATE = 0.3;
     public static final double ASSIST_SKILL_FACTOR = 7.0;
-    public static final double REBOUND_SKILL_FACTOR = 3.0;
+    public static final double REBOUND_SKILL_FACTOR = 5.0;
     public static final int MINUTES_FACTOR = 4;
 
     public Team team;
@@ -218,61 +218,80 @@ public class Roster {
     }
 
 
-    public Player chooseShooterAtRandom(){
-        double total = 0.0;
+    public Player chooseShooterAtRandom() {
+        double[] weights = new double[ROSTER_SIZE];
+        double totalWeight = 0.0;
+
         for (int i = 0; i < ROSTER_SIZE; i++) {
-            if (minutes[i] == 0){
+            int mins = minutes[i];
+            if (mins == 0) {
+                weights[i] = 0.0;
                 continue;
             }
-            total += Math.pow(minutes[i], 3);
-            total += skillReliance * players[i].getAttributeValue("3pt");
-            total += skillReliance * players[i].getAttributeValue("Midrange");
-            total += skillReliance * players[i].getAttributeValue("Rim Finishing");
 
+            double shootingSkill =
+                    players[i].getAttributeValue("3pt") +
+                    players[i].getAttributeValue("Midrange") +
+                    players[i].getAttributeValue("Rim Finishing");
+
+            double scaledSkill = Math.pow(shootingSkill, SHOOTING_SKILL_FACTOR); 
+
+            weights[i] = mins * scaledSkill;
+            totalWeight += weights[i];
         }
 
-        double r = Math.random() * total;
+        if (totalWeight == 0.0) {
+            return null;
+        }
+
+        double r = Math.random() * totalWeight;
         double cumulative = 0.0;
 
         for (int i = 0; i < ROSTER_SIZE; i++) {
-            if (minutes[i] == 0){
-                continue;
-            }
-            cumulative += Math.pow(minutes[i], 3);
-            cumulative += skillReliance * players[i].getAttributeValue("3pt");
-            cumulative += skillReliance * players[i].getAttributeValue("Midrange");
-            cumulative += skillReliance * players[i].getAttributeValue("Rim Finishing");
-            if (r <= cumulative) {
-                return (players[i]);
+            cumulative += weights[i];
+            if (cumulative >= r) {
+                return players[i];
             }
         }
-        // should never occur
-        return null;
 
+        return null; // Should never happen
     }
 
-    public Player getOffensiveRebounder(){
-        double total = 0.0;
+   public Player getOffensiveRebounder() {
+        double[] weights = new double[Roster.ROSTER_SIZE];
+        double totalWeight = 0.0;
+
         for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
-            if (getMinutes()[i] == 0){
+            int mins = getMinutes()[i];
+            if (mins == 0) {
+                weights[i] = 0.0;
                 continue;
             }
-            total += Math.pow(getMinutes()[i], MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Offensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE, REBOUND_SKILL_FACTOR);
+
+            double reboundSkill = getPlayer(i).getAttributeValue("Offensive Rebounding");
+
+            double normalizedSkill = reboundSkill / Attribute.ATTRIBUTE_AVERAGE;
+            double scaledSkill = Math.pow(normalizedSkill, REBOUND_SKILL_FACTOR);
+
+            weights[i] = mins * scaledSkill;
+            totalWeight += weights[i];
         }
-        double r = Math.random() * total;
+
+        if (totalWeight == 0.0) {
+            return null;
+        }
+
+        double r = Math.random() * totalWeight;
         double cumulative = 0.0;
 
         for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
-            if (getMinutes()[i] == 0){
-                continue;
-            }
-            cumulative += Math.pow(getMinutes()[i], MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Offensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE, REBOUND_SKILL_FACTOR);
-            if (r <= cumulative) {
+            cumulative += weights[i];
+            if (cumulative >= r) {
                 return getPlayer(i);
             }
         }
-        // should never return null
-        return null;
+
+        return null; // fallback (should never occur)
     }
 
     public Player getBallHandler(){
@@ -299,31 +318,39 @@ public class Roster {
         return null;
     }
 
-    public Player getDefensiveRebounder(){
-        double total = 0.0;
+    public Player getDefensiveRebounder() {
+        double[] weights = new double[Roster.ROSTER_SIZE];
+        double totalWeight = 0.0;
+
         for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
-            if (getMinutes()[i] == 0){
+            int mins = getMinutes()[i];
+            if (mins == 0) {
+                weights[i] = 0.0;
                 continue;
             }
-            //System.out.println("total: " + total);
-            total += Math.pow(getMinutes()[i], MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Defensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE, REBOUND_SKILL_FACTOR);
+
+            double reboundSkill = getPlayer(i).getAttributeValue("Defensive Rebounding");
+            double scaledSkill = Math.pow(reboundSkill, REBOUND_SKILL_FACTOR);
+
+            weights[i] = mins * scaledSkill;
+            totalWeight += weights[i];
         }
-        double r = Math.random() * total;
+
+        if (totalWeight == 0.0) {
+            return null;
+        }
+
+        double r = Math.random() * totalWeight;
         double cumulative = 0.0;
 
-        
         for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
-            if (getMinutes()[i] == 0){
-                continue;
-            }
-            //System.out.println("cumulative: " + cumulative);
-            cumulative += Math.pow(getMinutes()[i], MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Defensive Rebounding")/Attribute.ATTRIBUTE_AVERAGE, REBOUND_SKILL_FACTOR);
-            if (r <= cumulative) {
+            cumulative += weights[i];
+            if (cumulative >= r) {
                 return getPlayer(i);
             }
         }
-        //System.out.println("DEBUG");
-        return null;
+
+        return null; // fallback (should never occur)
     }
 
     public Player getAssister(){
@@ -332,7 +359,7 @@ public class Roster {
             if (getMinutes()[i] == 0){
                 continue;
             }
-            total += Math.pow(getMinutes()[i], MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE, ASSIST_SKILL_FACTOR) ;
+            total += getMinutes()[i] * Math.pow(getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE, ASSIST_SKILL_FACTOR) ;
         }
         double r = Math.random() * total;
         double cumulative = 0.0;
@@ -341,7 +368,7 @@ public class Roster {
             if (getMinutes()[i] == 0){
                 continue;
             }
-            cumulative += Math.pow(getMinutes()[i], MINUTES_FACTOR) * Math.pow(getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE, ASSIST_SKILL_FACTOR) ;
+            cumulative  += getMinutes()[i] * Math.pow(getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_AVERAGE, ASSIST_SKILL_FACTOR) ;
             if (r <= cumulative) {
                 if (((getPlayer(i).getAttributeValue("Passing")/Attribute.ATTRIBUTE_MAX) * ASSIST_RATE > Math.random())){
                     return getPlayer(i);
