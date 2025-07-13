@@ -133,7 +133,7 @@ public class Season {
     public void exportSeasonReportCSV(String filename, Team[] teams) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
             // Write CSV header
-            writer.write("Team,Record,Player,BPER,PTS,REB,AST,STL\n");
+            writer.write("Team,Record,Player,BPER,PTS,REB,AST,BLK,STL\n");
 
             for (Team team : teams) {
                 String teamName = team.getName();
@@ -151,11 +151,12 @@ public class Season {
                     double rpg = (double) p.rebounds / p.gamesPlayed;
                     double apg = (double) p.assists / p.gamesPlayed;
                     double spg = (double) p.steals / p.gamesPlayed;
+                    double bpg = (double) p.blocks / p.gamesPlayed;
                     double bper = p.cumBPER / p.gamesPlayed;
 
                     String playerName = escapeCSV(p.getName());
 
-                    writer.write(String.format("%s,%s,%s,%.2f,%.1f,%.1f,%.1f,%.1f\n",
+                    writer.write(String.format("%s,%s,%s,%.2f,%.1f,%.1f,%.1f,%.1f,%.1f\n",
                             escapeCSV(teamName),
                             record,
                             playerName,
@@ -163,6 +164,7 @@ public class Season {
                             ppg,
                             rpg,
                             apg,
+                            bpg,
                             spg));
                 }
             }

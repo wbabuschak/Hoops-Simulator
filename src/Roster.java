@@ -408,52 +408,68 @@ public class Roster {
     }
 
 
-    public Player getDefender(CourtLocations courtLocation){
+    public Player getDefender(CourtLocations courtLocation) {
         double total = 0.0;
-        String defenderAttribute;
-        switch(courtLocation){
+        boolean combinedDefense = false;
+        String defenderAttribute = null;
+
+        switch (courtLocation) {
             case CourtLocations.PAINT:
                 defenderAttribute = "Paint D";
                 break;
             case CourtLocations.MIDRANGE:
-                defenderAttribute = "combined_defense";
+                combinedDefense = true;
                 break;
             case CourtLocations.THREE:
                 defenderAttribute = "Perimeter D";
                 break;
-            // should never occur
             default:
-                return null;
+                System.err.println("courtLocation error");
+                return null;  // Should never occur
         }
+
+        // Calculate total weight
         for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
-            if (getMinutes()[i] == 0){
+            Player p = getPlayer(i);
+            if (p == null || getMinutes()[i] == 0) {
                 continue;
             }
-            if (defenderAttribute.equals("combined_defense")){
-                total += Math.pow(getMinutes()[i], 3) * (getPlayer(i).getAttributeValue("Paint D") + getPlayer(i).getAttributeValue("Perimeter D"))/ (2 * Attribute.ATTRIBUTE_AVERAGE);
+            double weight = Math.pow(getMinutes()[i], 3);
+            if (combinedDefense) {
+                weight *= (p.getAttributeValue("Paint D") + p.getAttributeValue("Perimeter D")) / (2.0 * Attribute.ATTRIBUTE_AVERAGE);
             } else {
-                total += Math.pow(getMinutes()[i], 3) * getPlayer(i).getAttributeValue(defenderAttribute)/Attribute.ATTRIBUTE_AVERAGE;
+                weight *= p.getAttributeValue(defenderAttribute) / Attribute.ATTRIBUTE_AVERAGE;
             }
-            
+            total += weight;
         }
+
+        if (total == 0) {
+            System.err.println("total == 0 error");
+            return null;  // No valid defender found
+        }
+
         double r = Math.random() * total;
         double cumulative = 0.0;
 
         for (int i = 0; i < Roster.ROSTER_SIZE; i++) {
-            if (getMinutes()[i] == 0){
+            Player p = getPlayer(i);
+            if (p == null || getMinutes()[i] == 0) {
                 continue;
             }
-            if (defenderAttribute.equals("combined_defense")){
-                cumulative += Math.pow(getMinutes()[i], 3) * (getPlayer(i).getAttributeValue("Paint D") + getPlayer(i).getAttributeValue("Perimeter D"))/ (2 * Attribute.ATTRIBUTE_AVERAGE);
+            double weight = Math.pow(getMinutes()[i], 3);
+            if (combinedDefense) {
+                weight *= (p.getAttributeValue("Paint D") + p.getAttributeValue("Perimeter D")) / (2.0 * Attribute.ATTRIBUTE_AVERAGE);
             } else {
-                cumulative += Math.pow(getMinutes()[i], 3) * getPlayer(i).getAttributeValue(defenderAttribute)/Attribute.ATTRIBUTE_AVERAGE;
+                weight *= p.getAttributeValue(defenderAttribute) / Attribute.ATTRIBUTE_AVERAGE;
             }
+            cumulative += weight;
             if (r <= cumulative) {
-                return getPlayer(i);
+                return p;
             }
         }
-        // returns null if no player is credited with assist
-        return null;
+
+        System.err.println("fallback error");
+        return null; // fallback, but should not happen if total > 0
     }
 
 

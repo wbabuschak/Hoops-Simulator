@@ -48,6 +48,7 @@ public class Player {
     public double rebounds;
     public double assists;
     public int steals;
+    public int blocks;
     public int gamesPlayed;
     public double cumBPER;
 
@@ -165,6 +166,8 @@ public class Player {
         attributes.add(new Attribute("Hard Fouls", 0.0));
         // Steals affects the chance to steal the ball on defense
         attributes.add(new Attribute("Steals", 0.0));
+        // Blocks affects the chance to block the ball on defense
+        attributes.add(new Attribute("Blocks", 0.0));
     }
 
     public static Player randomPlayer(Role role, double overall) {
@@ -210,7 +213,7 @@ public class Player {
         int heightDifference = player.height - neutralHeight;
         player.weight = (int) (210 + heightDifference * 10 * ((Math.random() + Math.random() + Math.random()) / 3));
         List<String> tallerBoosts = List.of(
-             "Paint D", "Defensive Consistency", "Offensive Rebounding", "Defensive Rebounding"
+             "Paint D", "Blocks", "Offensive Rebounding", "Defensive Rebounding"
         );
 
         List<String> tallerPenalties = List.of(

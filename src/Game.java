@@ -141,11 +141,19 @@ public class Game {
             Player stealer = stealAttempt(defenseTeam, offenseTeam);
             if (stealer == null) {
                 ShotAttempt attempt = takeShot(offenseTeam, offenseTeamStats, defenseTeam, defenseTeamStats);
-                while (!offenseTeamStats.changeScore(attempt) && !attempt.getFouled()) {
-                    if (!rebound(offenseTeam, offenseTeamStats, defenseTeam, defenseTeamStats)) {
-                        break;
+                if (attempt.isBlocked()) {
+                    // Handle block event (add block stat to blocker, turnover to offense, etc)
+                    defenseTeamStats.getStatsFromPlayer(attempt.getBlocker()).addBlock();
+                    attempt.getBlocker().blocks++;
+                    offenseTeamStats.turnover();
+                } else {
+                    // Normal shot processing, scoring, rebounding, fouls
+                    while (!offenseTeamStats.changeScore(attempt) && !attempt.getFouled()) {
+                        if (!rebound(offenseTeam, offenseTeamStats, defenseTeam, defenseTeamStats)) {
+                            break;
+                        }
+                        attempt = takeShot(offenseTeam, offenseTeamStats, defenseTeam, defenseTeamStats);
                     }
-                    attempt = takeShot(offenseTeam, offenseTeamStats, defenseTeam, defenseTeamStats);
                 }
             } else {
                 defenseTeamStats.getStatsFromPlayer(stealer).addSteal();
@@ -160,6 +168,7 @@ public class Game {
         
         Player ballCarrier = offenseTeam.getRoster().getBallHandler();
         Player defender = defenseTeam.getRoster().getDefender(ballCarrier.getShotLocation());
+
         if (defender.getAttributeValue("Steals") * Math.random() * STEAL_CHANCE > Math.random() * (ballCarrier.getAttributeValue("Offensive Discipline") + ballCarrier.getAttributeValue("Dribbling"))){
             defender.steals++;
             return defender;
@@ -205,6 +214,8 @@ public class Game {
 
         return shotAttempt;
     }
+
+    
 
     /**
      * returns the number of FTs on a shot, better disciplined-defenders foul less, better shooters get more fouls

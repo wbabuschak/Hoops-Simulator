@@ -9,6 +9,7 @@ public class PlayerStats {
     private int oRebounds;
     private int dRebounds;
     private int steals;
+    private int blocks;
     
     public int getSteals() {
         return steals;
@@ -156,8 +157,9 @@ public class PlayerStats {
         int ASS = getAssists();
         int TO = getTurnovers();
         int STL = getSteals();
+        int BLK = getBlocks();
 
-        return (double) (2 * PTS - 0.5 * FTA - FGA + 1.0 * DREB + 1.5 * OREB + 1.5 * ASS - 3.0 * TO + 2.0 * STL);
+        return (double) (2 * PTS - 0.5 * FTA - FGA + 1.0 * DREB + 1.5 * OREB + 1.5 * ASS - 3.0 * TO + 2.0 * STL + 2.0 * BLK);
     }
     
     public String toString() {
@@ -194,7 +196,14 @@ public class PlayerStats {
         sb.append(threePtString);
         sb.append(" | ");
 
-        // OREB string
+        // BLK string
+        String blocksString = (getBlocks() > 0)
+                ? String.format("%-8s", getBlocks() + " BLK")
+                : String.format("%-8s", "");
+        sb.append(blocksString);
+        sb.append(" | ");
+
+        // STL string
         String stealsString = (getSteals() > 0)
                 ? String.format("%-8s", getSteals() + " STL")
                 : String.format("%-8s", "");
@@ -211,7 +220,15 @@ public class PlayerStats {
     }
 
 
+    private int getBlocks() {
+        return blocks;
+    }
+
     public void addShotAttempt(ShotAttempt shotAttempt){
         shotAttempts.add(shotAttempt);
+    }
+
+    public void addBlock() {
+       blocks++;
     }
 }
