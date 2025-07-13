@@ -1,154 +1,92 @@
 public enum Archetype {
-    THREE_AND_D {
-        @Override
-        public double score(Player player) {
-            return player.getAttributeValue("3pt") +
-                   player.getAttributeValue("Contested 3pt") +
-                   player.getAttributeValue("Perimeter D");
-        }
-    },
-    POINT_GOD {
-        @Override
-        public double score(Player player) {
-            return player.getAttributeValue("Passing") +
-                   player.getAttributeValue("Dribbling") +
-                   player.getAttributeValue("Offensive Discipline");
-        }
-    },
-    THE_SYSTEM {
-        @Override
-        public double score(Player player) {
-            return player.getAttributeValue("Passing") +
-                   player.getAttributeValue("Dribbling") +
-                   player.getAttributeValue("3pt");
-        }
-    },
-    BRUISER {
-        @Override
-        public double score(Player player) {
-            return player.getAttributeValue("Defensive Rebounding") +
-                   player.getAttributeValue("Hard Fouls") +
-                   player.getAttributeValue("Paint D");
-        }
-    },
-    SKULL_BASHER {
-        @Override
-        public double score(Player player) {
-            return player.getAttributeValue("Offensive Rebounding") +
-                   player.getAttributeValue("Rim Finishing") +
-                   player.getAttributeValue("Contested Rim Finishing");
-        }
-    },
-    DEFENDER {
-        @Override
-        public double score(Player player) {
-            return player.getAttributeValue("Perimeter D") +
-                   player.getAttributeValue("Paint D") +
-                   player.getAttributeValue("Defensive Discipline");
-        }
-    },
     UNSHAKEABLE {
         @Override
         public double score(Player player) {
             return player.getAttributeValue("Contested Rim Finishing") +
-                   player.getAttributeValue("Contested Midrange") +
-                   player.getAttributeValue("Contested 3pt");
+                player.getAttributeValue("Contested Midrange") +
+                player.getAttributeValue("Contested 3pt") +
+                player.getAttributeValue("Offensive Consistency");
+        }
+    },
+    THREE_AND_D {
+        @Override
+        public double score(Player player) {
+            return player.getAttributeValue("Perimeter D") +
+                player.getAttributeValue("3pt") +
+                player.getAttributeValue("Contested 3pt") +
+                player.getAttributeValue("Defensive Consistency");
         }
     },
     SNIPER {
         @Override
         public double score(Player player) {
-            return player.getAttributeValue("Free Throw") +
-                   player.getAttributeValue("3pt") +
-                   player.getAttributeValue("Contested 3pt");
+            return player.getAttributeValue("Midrange") +
+            player.getAttributeValue("Free Throw") +
+            player.getAttributeValue("3pt") +
+            player.getAttributeValue("Contested 3pt");
         }
     },
-    MR_FUNDAMENTAL {
+    DEFENSIVE_MENACE {
         @Override
         public double score(Player player) {
-            return player.getAttributeValue("Free Throw") +
-                   player.getAttributeValue("Offensive Discipline") +
-                   player.getAttributeValue("Defensive Discipline");
+            return player.getAttributeValue("Defensive Discipline") +
+                player.getAttributeValue("Hard Fouls") +
+                player.getAttributeValue("Perimeter D") +
+                player.getAttributeValue("Paint D");
         }
     },
-    PACEMAKER {
+    POINT_GOD {
         @Override
         public double score(Player player) {
-            return player.getAttributeValue("Pace") +
-                   player.getAttributeValue("Passing") +
-                   player.getAttributeValue("Stamina");
+            return player.getAttributeValue("Offensive Consistency") +
+            player.getAttributeValue("Dribbling") +
+            player.getAttributeValue("Passing") +
+            player.getAttributeValue("Midrange");
         }
     },
-    CANNONBALL {
+    PLAY_FINISHER {
         @Override
         public double score(Player player) {
-            return player.getAttributeValue("Rim Finishing") +
-                   player.getAttributeValue("Dribbling") +
-                   player.getAttributeValue("Pace");
+            return player.getAttributeValue("3pt") +
+            player.getAttributeValue("Contested 3pt") +
+            player.getAttributeValue("Rim Finishing") +
+            player.getAttributeValue("Contested Rim Finishing");
         }
     },
-    MENACE {
+    BLUE_COLLAR_BALLER {
         @Override
         public double score(Player player) {
-            return player.getAttributeValue("Steals") +
-                   player.getAttributeValue("Defensive Rebounding") +
-                   player.getAttributeValue("Hard Fouls");
+            return player.getAttributeValue("Defensive Rebounding") +
+            player.getAttributeValue("Offensive Rebounding") +
+            player.getAttributeValue("Hard Fouls") +
+            player.getAttributeValue("Stamina");
         }
     },
-    PURE_ATHLETE {
+    THE_SYSTEM {
         @Override
         public double score(Player player) {
             return player.getAttributeValue("Stamina") +
-                   player.getAttributeValue("Pace") +
-                   player.getAttributeValue("Rim Finishing");
+            player.getAttributeValue("Dribbling") +
+            player.getAttributeValue("Passing") +
+            player.getAttributeValue("3pt");
         }
     },
-    PAINT_DEMON {
-        @Override
-        public double score(Player player) {
-            return player.getAttributeValue("Rim Finishing") +
-                   player.getAttributeValue("Contested Rim Finishing") +
-                   player.getAttributeValue("Offensive Discipline");
-        }
-    },
-    MR_TRIPLE_DOUBLE {
-        @Override
-        public double score(Player player) {
-            return player.getAttributeValue("Passing") +
-                   player.getAttributeValue("Defensive Rebounding") +
-                   player.getAttributeValue("Stamina");
-        }
-    },
-    CLUTCH_SHOOTER {
-        @Override
-        public double score(Player player) {
-            return player.getAttributeValue("Contested 3pt") +
-                   player.getAttributeValue("Offensive Discipline") +
-                   player.getAttributeValue("Free Throw");
-        }
-    },
-    WIZARD {
-        @Override
-        public double score(Player player) {
-            return player.getAttributeValue("Dribbling") +
-                   player.getAttributeValue("Offensive Discipline") +
-                   player.getAttributeValue("Rim Finishing");
-        }
-    },
-    THE_GLOVE {
+    STAT_SHEET_STUFFER {
         @Override
         public double score(Player player) {
             return player.getAttributeValue("Steals") +
-                   player.getAttributeValue("Defensive Discipline") +
-                   player.getAttributeValue("Perimeter D");
+            player.getAttributeValue("Blocks") +
+            player.getAttributeValue("Passing") +
+            player.getAttributeValue("Defensive Rebounding");
         }
     },
     THREE_LEVEL_SCORER {
         @Override
         public double score(Player player) {
             return player.getAttributeValue("3pt") +
-                   player.getAttributeValue("Midrange") +
-                   player.getAttributeValue("Rim Finishing");
+                player.getAttributeValue("Midrange") +
+                player.getAttributeValue("Rim Finishing") +
+                player.getAttributeValue("Free Throw");
         }
     };
 

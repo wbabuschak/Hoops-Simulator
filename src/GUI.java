@@ -9,7 +9,7 @@ public class GUI {
     String title = "Hoops Simulator 0.0.6";
     public static final int FREE_AGENTS = 400;
 
-    private int noTeams = 16;
+    private int noTeams = 20;
 
     private Team team1;
     private Team team2;
@@ -102,7 +102,7 @@ public class GUI {
         randomizeTeams();
         teamList = new JList<>(teams);
         teamScrollPane = new JScrollPane(teamList);
-        teamScrollPane.setPreferredSize(new Dimension(225, 240));
+        teamScrollPane.setPreferredSize(new Dimension(235, 240));
         teamList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(
@@ -139,7 +139,7 @@ public class GUI {
 
         attributeList = new JList<>();
         playerView = new JScrollPane(attributeList);
-        playerView.setPreferredSize(new Dimension(225, 240));
+        playerView.setPreferredSize(new Dimension(235, 240));
         playerList.addListSelectionListener(e -> {
             updatePlayerView(0);
         });
@@ -173,7 +173,7 @@ public class GUI {
         playerArchetype = new JTextArea();
         playerArchetype.setEditable(false);
         playerArchetype.setOpaque(false);
-        playerArchetype.setPreferredSize(new Dimension(225, 140));
+        playerArchetype.setPreferredSize(new Dimension(235, 140));
         playerArchetype.setFocusable(false);
         playerArchetype.setFont(new Font("SansSerif", Font.BOLD, 16));
 

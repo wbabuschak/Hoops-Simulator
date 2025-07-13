@@ -35,6 +35,7 @@ public class ShotAttempt {
      */
     public static final double ASSIST_EFFECT = 0.4;
     private static final double BLOCK_CHANCE = 0.2;
+    private static final double BLOCK_CHANCE_FALLOFF = 0.8;
     
 
     private Player player;
@@ -148,6 +149,16 @@ public class ShotAttempt {
             double blockChance = defender.getAttributeValue("Blocks") 
                                 / Attribute.ATTRIBUTE_MAX
                                 * BLOCK_CHANCE;
+
+            switch (courtLocation) {
+                // falloff applies twice on threes, once on midrange, none on rim shots
+                case THREE:
+                    blockChance *= BLOCK_CHANCE_FALLOFF;
+                case MIDRANGE:
+                    blockChance *= BLOCK_CHANCE_FALLOFF;
+                default:
+                    break;
+            }
 
             double blockThreshold = 1.0 - shotQuality;
 

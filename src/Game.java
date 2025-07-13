@@ -18,7 +18,7 @@ public class Game {
      * A higher three foul difficulty means a defender is less likely to foul on a three pointer
      */
     public static final double THREE_FOUL_DIFFICULTY = 0.6;
-    private static final double STEAL_CHANCE = 0.3;
+    private static final double STEAL_CHANCE = 0.25;
 
 
     Team team1;
@@ -145,7 +145,6 @@ public class Game {
                     // Handle block event (add block stat to blocker, turnover to offense, etc)
                     defenseTeamStats.getStatsFromPlayer(attempt.getBlocker()).addBlock();
                     attempt.getBlocker().blocks++;
-                    offenseTeamStats.turnover();
                 } else {
                     // Normal shot processing, scoring, rebounding, fouls
                     while (!offenseTeamStats.changeScore(attempt) && !attempt.getFouled()) {

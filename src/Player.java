@@ -213,11 +213,11 @@ public class Player {
         int heightDifference = player.height - neutralHeight;
         player.weight = (int) (210 + heightDifference * 10 * ((Math.random() + Math.random() + Math.random()) / 3));
         List<String> tallerBoosts = List.of(
-             "Paint D", "Blocks", "Offensive Rebounding", "Defensive Rebounding"
+             "Rim Finishing", "Blocks", "Offensive Rebounding", "Defensive Rebounding"
         );
 
         List<String> tallerPenalties = List.of(
-            "Dribbling", "Perimeter D", "Free Throw", "Passing"
+            "Dribbling", "Steals", "Free Throw", "Passing"
         );
         
 
