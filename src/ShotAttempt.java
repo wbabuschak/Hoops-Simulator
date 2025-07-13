@@ -34,7 +34,7 @@ public class ShotAttempt {
      * The greatest possible assist impact is 1 (i.e. assisted shots are always max skill)
      */
     public static final double ASSIST_EFFECT = 0.4;
-    private static final double BLOCK_CHANCE = 0.1;
+    private static final double BLOCK_CHANCE = 0.2;
     
 
     private Player player;
