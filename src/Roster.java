@@ -3,8 +3,8 @@ public class Roster {
     public static boolean forceRosterLimit = false;
     public static final double SHOOTING_SKILL_FACTOR = 3.0;
     public static final int MINUTES_RFACTOR = 5;
-    public static final double ASSIST_RATE = 0.3;
-    public static final double ASSIST_SKILL_FACTOR = 7.0;
+    public static final double ASSIST_RATE = 0.35;
+    public static final double ASSIST_SKILL_FACTOR = 9.0;
     public static final double REBOUND_SKILL_FACTOR = 5.0;
     public static final int MINUTES_FACTOR = 4;
 
@@ -206,7 +206,35 @@ public class Roster {
     }
 
     public void initializeMinutes(){
-        minutes = new int[]{32, 32, 32, 32, 32, 24, 24, 12, 12, 8, 0, 0};
+        switch ((int) (Math.random() * 6)){
+            case 0:
+                // positionless, low curve
+                minutes = new int[]{32, 32, 32, 32, 32, 24, 24, 12, 12, 6, 1, 1};
+                break;
+            case 1:
+                // PG + C
+                minutes = new int[]{38, 31, 31, 31, 38, 24, 23, 12, 9, 1, 1, 1};
+                break;
+            case 2:
+                // SG + SF
+                minutes = new int[]{31, 38, 38, 31, 31, 24, 23, 12, 8, 1, 1, 1};
+                break;
+            case 3:
+                // PF + SC
+                minutes = new int[]{31, 31, 31, 38, 38, 24, 23, 12, 8, 1, 1, 1};
+                break;
+            case 4:
+                // Heavy starters, high curve
+                minutes = new int[]{36, 36, 36, 36, 36, 24, 18, 10, 5, 1, 1, 1};
+                break;
+            case 5:
+                // Light starters, low curve
+                minutes = new int[]{30, 30, 30, 30, 30, 24, 20, 16, 12, 10, 4, 4};
+                break;
+            default:
+                minutes = new int[]{20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20};
+        }
+        
     }
 
     public int calculateRosterMinutes(int i) {

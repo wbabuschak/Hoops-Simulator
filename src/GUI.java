@@ -6,10 +6,10 @@ import java.util.ArrayList;
 
 
 public class GUI {
-    String title = "Hoops Simulator 0.0.5";
-    public static final int FREE_AGENTS = 700;
+    String title = "Hoops Simulator 0.0.6";
+    public static final int FREE_AGENTS = 400;
 
-    private int noTeams = 24;
+    private int noTeams = 16;
 
     private Team team1;
     private Team team2;

@@ -161,6 +161,7 @@ public class Game {
         Player ballCarrier = offenseTeam.getRoster().getBallHandler();
         Player defender = defenseTeam.getRoster().getDefender(ballCarrier.getShotLocation());
         if (defender.getAttributeValue("Steals") * Math.random() * STEAL_CHANCE > Math.random() * (ballCarrier.getAttributeValue("Offensive Discipline") + ballCarrier.getAttributeValue("Dribbling"))){
+            defender.steals++;
             return defender;
         }
         return null;

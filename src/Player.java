@@ -47,6 +47,7 @@ public class Player {
     public double points;
     public double rebounds;
     public double assists;
+    public int steals;
     public int gamesPlayed;
     public double cumBPER;
 
