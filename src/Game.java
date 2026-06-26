@@ -63,12 +63,16 @@ public class Game {
         }
         getWinner().wins++;
         team1.gamesPlayed++;
+        team1.pointsAllowed += teamstats2.getScore();
+        team1.pointsScored += teamstats1.getScore();
         team2.gamesPlayed++;
+        team2.pointsAllowed += teamstats1.getScore();
+        team2.pointsScored += teamstats2.getScore();
     }
 
     
 
-    private void addPlayerMinutes(TeamStats teamStats, Team team, boolean isOvertime) {
+    private void addPlayerMinutes(TeamStats teamStats, Team team, boolean isOvertime) { 
         Random rng = new Random();
         Roster roster = team.getRoster();
         int[] avgMinutesArray = roster.getMinutes();

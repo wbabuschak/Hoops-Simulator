@@ -6,8 +6,9 @@ import java.util.ArrayList;
 
 
 public class GUI {
-    String title = "Hoops Simulator 0.0.6";
+    String title = "Hoops Simulator 0.1.0";
     public static final int FREE_AGENTS = 400;
+    public static final int ROLE_PLAYER_CUTOFF = 65;
 
     private int noTeams = 20;
 
@@ -33,15 +34,19 @@ public class GUI {
     private JScrollPane teamView;
     private JList<Player> playerList;
 
+    private JTextArea teamStats;
+
     private JScrollPane playerView;
     private JList<Attribute> attributeList;
 
+    private JTextArea rosterInfo;
     private JTextArea playerArchetype;
     
     private Season season;
     private JList<Game> gameList;
 
     private JLabel matchupRecord;
+    private JLabel teamLabel;
 
     private JButton btnPlayAll;
     private JTextArea taBest;
@@ -52,9 +57,14 @@ public class GUI {
 
     private JButton btnAddFreeAgent;
     private JButton btnPrintSeason;
+    private JButton btnDesignateStar;
 
-    private JPanel buttonPanel = new JPanel(new GridLayout(4,4,2,2));
+    
+    private JPanel leagueButtonPanel = new JPanel(new GridLayout(5,2,2,2));
+    private JPanel teamButtonPanel = new JPanel(new GridLayout(5,2,2,2));
 
+    JButton btnMVP;
+    JButton btnAllStar;
     public GUI(){
         season = new Season();
         backFrame = new JFrame();
@@ -66,7 +76,7 @@ public class GUI {
         taMatchup.setEditable(false);
         taMatchup.setFont(new Font("Monospaced",Font.PLAIN,12));
         gameScrollPane = new JScrollPane(taMatchup);
-        gameScrollPane.setPreferredSize(new Dimension(720, 360));
+        gameScrollPane.setPreferredSize(new Dimension(640, 360));
 
         btnSetTeam1 = new JButton("Set Home Team");
         btnSetTeam1.addActionListener(e -> {
@@ -96,6 +106,7 @@ public class GUI {
 
         btnSimulate = new JButton("Simulate Game");
         btnSimulate.addActionListener(e -> simulateGame());
+        
 
         matchupRecord = new JLabel(" - ");
 
@@ -117,7 +128,7 @@ public class GUI {
                 
                 Team team = (Team) value;
                 label.setText(team.getName() + " (" + team.wins + "-" + (team.gamesPlayed - team.wins) + ")");
-                
+                if (team == teams[0]) label.setBackground(new Color(105,185,105));
                 return label;
             }
         });
@@ -177,6 +188,20 @@ public class GUI {
         playerArchetype.setFocusable(false);
         playerArchetype.setFont(new Font("SansSerif", Font.BOLD, 16));
 
+        teamStats = new JTextArea();
+        teamStats.setEditable(false);
+        teamStats.setOpaque(false);
+        teamStats.setPreferredSize(new Dimension(235, 140));
+        teamStats.setFocusable(false);
+        teamStats.setFont(new Font("SansSerif", Font.BOLD, 16));
+
+        rosterInfo = new JTextArea();
+        rosterInfo.setEditable(false);
+        rosterInfo.setOpaque(false);
+        rosterInfo.setPreferredSize(new Dimension(235, 140));
+        rosterInfo.setFocusable(false);
+        rosterInfo.setFont(new Font("SansSerif", Font.BOLD, 14));
+
         mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15)); 
         mainPanel.setLayout(new GridBagLayout());
         mainPanel.setBackground(new Color((float) (0.5 + 0.5 * Math.random()), (float) (0.5 + 0.5 * Math.random()),(float) (0.5 + 0.5 * Math.random())));
@@ -193,19 +218,23 @@ public class GUI {
             updateGameLog();
             teamList.setListData(teams);
             updateMatchupLabel();
+            clearTeamStats();
             season.updateStats();
+            btnAllStar.setEnabled(true);
+            btnMVP.setEnabled(true);
         });
         
         taBest = new JTextArea();
         taBest.setEditable(false);
         taBest.setLineWrap(true);
         taBest.setWrapStyleWord(true);
-        taBest.setPreferredSize(new Dimension(200, 100));
-        JButton btnMVP = new JButton("Find MVP");
-        
+        taBest.setPreferredSize(new Dimension(300, 200));
+
+        btnMVP = new JButton("Find MVP");
+        btnMVP.setEnabled(false);
         btnMVP.addActionListener(
             e -> {
-                Player MVP = season.findMVP();
+                Player MVP = season.findBest(null,1)[0];
                 if (MVP == null){
                     taBest.setText("");
                     return;
@@ -213,6 +242,37 @@ public class GUI {
                 int gamesPlayed = MVP.gamesPlayed;
                 taBest.setText(MVP.toString() + " " + (int) (MVP.points / gamesPlayed) + "/" + (int) (MVP.rebounds / gamesPlayed) + "/" + (int) (MVP.assists / gamesPlayed) + "\n" + MVP.getTeam());
             });
+
+        btnAllStar = new JButton("Generate All-Star Team");
+        btnAllStar.setEnabled(false);
+        btnAllStar.addActionListener(
+            e -> {
+                Player[] allStars = new Player[10];
+                Player[] PGs = season.findBest(Role.PG,2);
+                Player[] SGs = season.findBest(Role.SG,2);
+                Player[] SFs = season.findBest(Role.SF,2);
+                Player[] PFs = season.findBest(Role.PF,2);
+                Player[] Cs = season.findBest(Role.C,2);
+
+                allStars[0] = PGs[0];
+                allStars[1] = SGs[0];
+                allStars[2] = SFs[0];
+                allStars[3] = PFs[0];
+                allStars[4] = Cs[0];
+                allStars[5] = PGs[1];
+                allStars[6] = SGs[1];
+                allStars[7] = SFs[1];
+                allStars[8] = PFs[1];
+                allStars[9] = Cs[1];
+                // System.out.print(allStars);
+                String allstarString = "";
+                for (Player p : allStars){
+                    int gamesPlayed = p.gamesPlayed;
+                    allstarString += (p.toString() + " " + (int) (p.points / gamesPlayed) + "/" + (int) (p.rebounds / gamesPlayed) + "/" + (int) (p.assists / gamesPlayed) + "\n");
+                }
+                taBest.setText(allstarString);
+            });
+
 
         JButton btnPerf = new JButton("Find Best Performance");
         btnPerf.addActionListener(
@@ -225,37 +285,68 @@ public class GUI {
                 Player bestPlayer = best.player;
                 taBest.setText(bestPlayer.toString() + " " + (best));
             });
+        
+        Team userTeam = teams[0];
+        teamLabel = new JLabel(userTeam.getName());
 
         btnAddFreeAgent = new JButton("Add Free Agent");
-        btnAddFreeAgent.addActionListener(e -> addFreeAgent());
+        btnAddFreeAgent.addActionListener(e -> addFreeAgent(userTeam));
 
         btnPrintSeason = new JButton("Print Season");
         btnPrintSeason.addActionListener(e -> season.exportSeasonReportCSV("season_report.csv",teams));
 
+        btnDesignateStar = new JButton("Designate Star");
+        btnDesignateStar.addActionListener(e -> designateStar(userTeam));
         
-        buttonPanel.add(btnSimulate);
-        buttonPanel.add(btnPlayAll);
-        buttonPanel.add(btnPerf);
-        buttonPanel.add(btnMVP);
+        leagueButtonPanel.add(btnSimulate);
+        btnSimulate.setToolTipText("Simulate a game between selected home and away team");
+        leagueButtonPanel.add(btnPlayAll);
+        btnPlayAll.setToolTipText("Simulate a game for every team against each other");
         
-        buttonPanel.add(btnSetTeam1);
-        buttonPanel.add(btnSetTeam2);
+        leagueButtonPanel.add(btnMVP);
+        btnMVP.setToolTipText("Find the highest-graded player by BPER");
+        leagueButtonPanel.add(btnAllStar);
+        btnAllStar.setToolTipText("Find the two highest-graded players by BPER of each position");
+
+        leagueButtonPanel.add(btnSetTeam1);
+        btnSetTeam1.setToolTipText("Set the currently selected team as the home team");
+        leagueButtonPanel.add(btnSetTeam2);
+        btnSetTeam2.setToolTipText("Set the currently selected team as the away team");
         
-        buttonPanel.add(btnAddFreeAgent);
-        buttonPanel.add(btnPrintSeason);
+        
+        leagueButtonPanel.add(btnPrintSeason);
+        btnPrintSeason.setToolTipText("Print all currently rostered players' stats to season_report.csv");
+
+        
+        leagueButtonPanel.add(btnPerf);
+        btnPerf.setToolTipText("Find the highest-graded single-game performance by BPER");
+
+        teamButtonPanel.add(btnAddFreeAgent);
+        btnAddFreeAgent.setToolTipText("Replace the selected player (from your team only) with the selected free agent");
+        teamButtonPanel.add(btnDesignateStar);
+        btnDesignateStar.setToolTipText("Designate the selected player as a star, increasing shot volume");
 
         addElement(iconImage, 0, 0);
+        addElement(teamLabel, 1, 0);
         addElement(teamScrollPane,2,0);
         addElement(teamView, 3, 0);
         addElement(playerView, 4, 0);
-        addElement(gameScrollPane, 1, 4);
+        
+        addElement(leagueButtonPanel, 0, 1);
+        addElement(leagueButtonPanel, 0, 1);
+        addElement(teamStats, 2, 1);
+        addElement(rosterInfo, 3, 1);
         addElement(playerArchetype, 4, 1);
+
+        addElement(gameScrollPane, 1, 4);
         addElement(gameLog, 1, 5);
         addElement(matchupRecord, 1, 2);
         addElement(taBest, 2, 4);
-        addElement(freeAgentScrollPane, 0, 4);
 
-        addElement(buttonPanel, 0, 1);
+        addElement(freeAgentScrollPane, 3, 4);
+        addElement(teamButtonPanel, 4, 4);
+
+        
 
         backFrame.add(mainPanel, BorderLayout.CENTER);
         backFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -335,6 +426,8 @@ public class GUI {
                 return label;
             }
         });
+        updateTeamStats();
+        updateRosterInfo();
     }
 
     /**
@@ -395,6 +488,7 @@ public class GUI {
         taMatchup.setCaretPosition(0);
         updateMatchupLabel();
         season.updateStats();
+        updateTeamView();
     }
 
     private void updateMatchupLabel(){
@@ -412,6 +506,17 @@ public class GUI {
             }
         }
         matchupRecord.setText(i1 + "-" + i2);
+    }
+
+    private void updateRosterInfo(){
+        Team team = teamList.getSelectedValue();
+        int expectedSalary = 0;
+        for (Player p : team.getRoster().players){
+            expectedSalary += p.expectedSalary();
+        }
+        String str = "Current payroll: $" + (expectedSalary / 1000000) + "M/" + (Roster.SALARY_CAP/1000000) + "M";
+        str += "\nRemaining cap: $" + (0-(expectedSalary-Roster.SALARY_CAP));
+        rosterInfo.setText(str);
     }
 
     private void updateGameLog(){
@@ -457,13 +562,39 @@ public class GUI {
         }
         Player player = list.getSelectedValue();
         int gamesPlayed = player.gamesPlayed;
-        playerArchetype.setText(
-            player.getName() + "\n" + 
-            player.role.name() + "\n" + 
-            Player.toFeet(player.getHeight()) + "\n" + 
-            player.getWeight() + " lbs\n" + 
-            (int) (player.points / gamesPlayed) + "/" + (int) (player.rebounds / gamesPlayed) + "/" + (int) (player.assists / gamesPlayed) + "\n" +
-            Archetype.findArchetype(player).name());
+        String archetype = "Role Player";
+        if (player.star || player.overall() >= ROLE_PLAYER_CUTOFF ) archetype = Archetype.findArchetype(player).name();
+        String str = player.getName() + " " + player.role.name() + "\n" + 
+            Player.toFeet(player.getHeight()) + " / " + player.getWeight() + " lbs\n";
+        if (gamesPlayed > 0) str += (int) (player.points / gamesPlayed) + "/" + (int) (player.rebounds / gamesPlayed) + "/" + (int) (player.assists / gamesPlayed) + " in " + (int) (player.minutes / gamesPlayed) + " mpg" + "\n";
+        str += "Expected Salary: $" + Utility.round(player.expectedSalary(), 2)  + "/yr" + "\n" +
+            archetype;
+
+        playerArchetype.setText(str);
+    }
+
+    private void updateTeamStats(){
+        Team team = teamList.getSelectedValue();
+        int gamesPlayed = team.gamesPlayed;
+        if (gamesPlayed <= 0){
+            return;
+        }
+
+        double ortg = team.pointsScored / (double) team.gamesPlayed;
+        double drtg = team.pointsAllowed / (double) team.gamesPlayed;
+        double netrtg = ortg - drtg;
+        
+        teamStats.setText(
+            gamesPlayed + " games played\n" + 
+            "ORTG: " + Utility.round(ortg,1) + "\n" +
+            "DRTG: " + Utility.round(drtg,1) + "\n" +
+            "Net RTG: " + Utility.round(netrtg,1) + "\n"
+        );
+
+    }
+
+    private void clearTeamStats(){
+        teamStats.setText("");
     }
 
     private void populateFreeAgents(){
@@ -474,12 +605,24 @@ public class GUI {
         
     }
 
-    private void addFreeAgent(){
+    private void addFreeAgent(Team userTeam){
         Team team = teamList.getSelectedValue();
         Player player = playerList.getSelectedValue();
         Player freeAgent = freeAgentList.getSelectedValue();
         if (team == null || player == null || freeAgent == null){
             return;   
+        }
+
+        if (team != userTeam){
+            return;   
+        }
+
+        int teamCurrentSalary = team.getRoster().expectedSalary();
+        int teamNewSalary = teamCurrentSalary - player.expectedSalary() + freeAgent.expectedSalary();
+
+        // can not add new player if roster would go above salary cap or put you in a further deficet
+        if (teamNewSalary > Roster.SALARY_CAP && teamNewSalary > teamCurrentSalary){
+            return;
         }
         
         freeAgents[freeAgentList.getSelectedIndex()] = team.getRoster().replacePlayer(team.getRoster().getPosition(player), freeAgent);
@@ -487,6 +630,20 @@ public class GUI {
         freeAgentList.setListData(freeAgents);
         playerList.setSelectedValue(freeAgent, true);
         freeAgentList.setSelectedValue(player, true);
+    }
+
+    private void designateStar(Team userTeam){
+        Team team = teamList.getSelectedValue();
+        Player player = playerList.getSelectedValue();
+        if (player == null){
+            return;   
+        }
+        if (team != userTeam){
+            return;   
+        }
+        player.star = !player.star;
+        updateTeamView();
+        freeAgentList.setListData(freeAgents);
     }
     
 }

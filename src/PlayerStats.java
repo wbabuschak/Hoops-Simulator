@@ -10,6 +10,7 @@ public class PlayerStats {
     private int dRebounds;
     private int steals;
     private int blocks;
+    private int minutes;
     
     public int getSteals() {
         return steals;
@@ -20,10 +21,14 @@ public class PlayerStats {
     }
 
 
-    public int minutes;
+    
 
     public int getMinutes() {
         return minutes;
+    }
+
+    public void addMinutes(int d) {
+        minutes += d;
     }
 
     public void setMinutes(int minutes) {
@@ -159,7 +164,7 @@ public class PlayerStats {
         int STL = getSteals();
         int BLK = getBlocks();
 
-        return (double) (2 * PTS - 0.5 * FTA - FGA + 1.0 * DREB + 1.5 * OREB + 1.5 * ASS - 3.0 * TO + 2.0 * STL + 2.0 * BLK);
+        return (double) (2 * PTS - 0.5 * FTA - FGA + 1.0 * DREB + 1.5 * OREB + 2 * ASS - 3.0 * TO + 2.0 * STL + 2.0 * BLK);
     }
     
     public String toString() {

@@ -8,6 +8,8 @@ public class Team {
     Roster roster;
     int wins;
     int gamesPlayed;
+    int pointsAllowed;
+    int pointsScored;
 
     private static ArrayList<String> cities;
     private static ArrayList<String> teamNames;
@@ -47,6 +49,10 @@ public class Team {
             team.getRoster().addPlayer(i, Player.randomPlayer(Role.ATH));
         }
         team.getRoster().teamSort();
+        team.wins = 0;
+        team.gamesPlayed = 0;
+        team.pointsAllowed = 0;
+        team.pointsScored = 0;
         return team;
     }
 

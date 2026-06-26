@@ -7,6 +7,8 @@ public class Roster {
     public static final double ASSIST_SKILL_FACTOR = 11.0;
     public static final double REBOUND_SKILL_FACTOR = 5.5;
     public static final int MINUTES_FACTOR = 4;
+    public static final double STAR_BONUS = 2.0;
+    public static final int SALARY_CAP = 10000000;
 
     public Team team;
 
@@ -43,6 +45,14 @@ public class Roster {
                 }
             }
         }
+    }
+
+    public int expectedSalary(){
+        int cum = 0;
+        for (int i = 0; i < ROSTER_SIZE - 1; i++){
+            cum += getPlayer(i).expectedSalary();
+        }
+        return cum;
     }
 
     /**
@@ -264,7 +274,10 @@ public class Roster {
 
             double scaledSkill = Math.pow(shootingSkill, SHOOTING_SKILL_FACTOR); 
 
-            weights[i] = mins * scaledSkill;
+            double starBonus = 1.0;
+            if (players[i].star) starBonus = STAR_BONUS;
+
+            weights[i] = mins * scaledSkill * starBonus;
             totalWeight += weights[i];
         }
 

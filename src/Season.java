@@ -27,6 +27,7 @@ public class Season {
             player.cumBPER += ps.calculateBPER();
             player.gamesPlayed++;
         }
+        
     }
 
     public void playAll(Team[] teams){
@@ -55,22 +56,31 @@ public class Season {
         }
     }
 
-    public Player findMVP() {
+    public Player[] findBest(Role role, int count) {
         if (players.isEmpty()) return null;
-
-        Player mvp = null;
-        double maxAveBPER = Double.NEGATIVE_INFINITY;
-
-        for (Player p : players) {
-            if (p.gamesPlayed == 0) continue;
-            double aveBPER = p.cumBPER / p.gamesPlayed;
-            if (aveBPER > maxAveBPER) {
-                maxAveBPER = aveBPER;
-                mvp = p;
+        Player[] best = new Player[count];
+        for (int i = 0; i < count; i++){
+            double maxAveBPER = Double.NEGATIVE_INFINITY;
+            playersearch:
+            for (Player p : players) {
+                for (Player b : best){
+                    if (p == b){
+                        continue playersearch;
+                    }
+                }
+                if (role != null){
+                    if (p.getRole() != role) continue;
+                }
+                if (p.gamesPlayed == 0) continue;
+                double aveBPER = p.cumBPER / p.gamesPlayed;
+                if (aveBPER > maxAveBPER) {
+                    maxAveBPER = aveBPER;
+                    best[i] = p;
+                }
             }
         }
-
-        return mvp;
+        
+        return best;
     }
 
     public void updateStats() {
@@ -79,6 +89,7 @@ public class Season {
         findPlayers();
 
         for (Player p : players) {
+            p.minutes = 0;
             p.points = 0;
             p.rebounds = 0;
             p.assists = 0;
@@ -91,6 +102,7 @@ public class Season {
                 Player player = ps.player;
                 if (!players.contains(player)) continue;
 
+                player.minutes += ps.getMinutes();
                 player.points += ps.getPoints();
                 player.rebounds += ps.getRebounds();
                 player.assists += ps.getAssists();
@@ -101,7 +113,8 @@ public class Season {
             for (PlayerStats ps : game.teamstats2.getPlayerStats()) {
                 Player player = ps.player;
                 if (!players.contains(player)) continue;
-
+                
+                player.minutes += ps.getMinutes();
                 player.points += ps.getPoints();
                 player.rebounds += ps.getRebounds();
                 player.assists += ps.getAssists();
@@ -133,7 +146,7 @@ public class Season {
     public void exportSeasonReportCSV(String filename, Team[] teams) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
             // Write CSV header
-            writer.write("Team,Record,Player,BPER,PTS,REB,AST,BLK,STL\n");
+            writer.write("Team,Record,Player,MIN,BPER,PTS,REB,AST,BLK,STL\n");
 
             for (Team team : teams) {
                 String teamName = team.getName();
@@ -147,6 +160,7 @@ public class Season {
                 for (Player p : teamPlayers) {
                     if (p == null || p.gamesPlayed == 0) continue;
 
+                    double mpg = (double) p.minutes / p.gamesPlayed;
                     double ppg = (double) p.points / p.gamesPlayed;
                     double rpg = (double) p.rebounds / p.gamesPlayed;
                     double apg = (double) p.assists / p.gamesPlayed;
@@ -156,10 +170,11 @@ public class Season {
 
                     String playerName = escapeCSV(p.getName());
 
-                    writer.write(String.format("%s,%s,%s,%.2f,%.1f,%.1f,%.1f,%.1f,%.1f\n",
+                    writer.write(String.format("%s,%s,%s,%.2f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\n",
                             escapeCSV(teamName),
                             record,
                             playerName,
+                            mpg,
                             bper,
                             ppg,
                             rpg,

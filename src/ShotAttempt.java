@@ -4,7 +4,7 @@ public class ShotAttempt {
     /**
      * 
      */
-    public static final double RIM_SHOT_MAX = 1.5;
+    public static final double RIM_SHOT_MAX = 1.35;
     /**
      * The worst possible shot attempt at the rim has a 5% chance of going in
      */
@@ -12,7 +12,7 @@ public class ShotAttempt {
     /**
      * The best possible shot attempt at the free throw line has a 95% chance of going in
      */
-    public static final double FT_MAX = 0.95;
+    public static final double FT_MAX = 0.90;
     /**
      * The worst possible shot attempt at the free throw line has a 35% chance of going in
      */
@@ -20,7 +20,7 @@ public class ShotAttempt {
     /**
      * 
      */
-    public static final double THREE_MAX = 0.85;
+    public static final double THREE_MAX = 0.80;
     /**
      * The worst possible shot attempt from three has a 1% chance of going in
      */

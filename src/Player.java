@@ -5,8 +5,6 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 
-
-
 public class Player {
     public static final double OVERALL_SCALAR = 2.5;
     public static final double POSITIONAL_BOOST = 0.1;
@@ -34,6 +32,8 @@ public class Player {
 
     public Role role;
 
+    public boolean star;
+
     public Role getRole() {
         return role;
     }
@@ -49,6 +49,7 @@ public class Player {
     public double assists;
     public int steals;
     public int blocks;
+    public int minutes;
     public int gamesPlayed;
     public double cumBPER;
 
@@ -128,6 +129,7 @@ public class Player {
         height = -1;
         weight = -1;
         age = -1;
+        star = false;
         this.role = role;
         // Rim Finishing affects scoring ability in the paint
         attributes.add(new Attribute("Rim Finishing", 0.0));
@@ -168,6 +170,10 @@ public class Player {
         attributes.add(new Attribute("Steals", 0.0));
         // Blocks affects the chance to block the ball on defense
         attributes.add(new Attribute("Blocks", 0.0));
+    }
+
+    public int expectedSalary(){
+        return (int) ((Math.pow((double) overall() / Attribute.ATTRIBUTE_AVERAGE,1.5)) * (Roster.SALARY_CAP * 0.75 / Roster.ROSTER_SIZE));
     }
 
     public static Player randomPlayer(Role role, double overall) {
@@ -269,7 +275,13 @@ public class Player {
         return randomPlayer(role, overall);
     }
 
-    
+    public boolean getStar(){
+        return star;
+    };
+
+    public void setStar(boolean s){
+        star = s;
+    }
 
     public String getName(){
         return name;
@@ -296,8 +308,10 @@ public class Player {
     }
 
     public String toString(){
-        
-        return toFeet(height) + " " + role + " " + name + " (" + overall() + ")";
+        String str = toFeet(height) + " " + role;
+        if (this.star) str += "*";
+        str += " " + name + " (" + overall() + ")";
+        return str;
     }
 
     public static String randomName(){
